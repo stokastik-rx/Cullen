@@ -53,62 +53,44 @@ A production-ready FastAPI starter application with a ChatGPT-like web interface
 └── README.md
 ```
 
-## Setup
+## Quick Start
 
-### 1. Create a virtual environment
+### For New Users
 
+If you just cloned this repository and are setting it up for the first time, see **[SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)** for detailed step-by-step instructions.
+
+### Quick Setup (For Experienced Users)
+
+1. **Create and activate virtual environment:**
+   ```bash
+   python -m venv venv
+   # Windows:
+   venv\Scripts\activate
+   # Mac/Linux:
+   source venv/bin/activate
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install --upgrade pip
+   pip install fastapi uvicorn[standard] pydantic pydantic-settings python-dotenv
+   ```
+
+3. **Run the application:**
+   ```bash
+   python run.py
+   ```
+
+4. **Open in browser:**
+   - Chat Interface: http://localhost:8000
+   - API Docs: http://localhost:8000/docs
+
+### Optional: Environment Variables
+
+Copy `env.example` to `.env` and customize settings if needed:
 ```bash
-python -m venv venv
+cp env.example .env
 ```
-
-### 2. Activate the virtual environment
-
-**Windows:**
-```bash
-venv\Scripts\activate
-```
-
-**Linux/Mac:**
-```bash
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure environment variables
-
-Copy the example environment file and update with your values:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and update the configuration values, especially:
-- `SECRET_KEY`: Generate a strong random secret key
-- `DATABASE_URL`: Configure your database connection
-- `CORS_ORIGINS`: Add your frontend URLs
-
-### 5. Run the application
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Or using the configuration from `.env`:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-The application will be available at:
-- **Chat Interface**: http://localhost:8000 (main page)
-- API: http://localhost:8000
-- Interactive API docs: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
 
 ## Chat Interface
 
