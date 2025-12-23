@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <button class="new-chat-button" id="newChatBtn">
+                        New Chat
+                    </button>
+                </div>
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-header">
+                        <span>ROSTER</span>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-header">
+                        <span>CHATS</span>
+                        <button class="sidebar-header-action" id="chatsMenuBtn">⋯</button>
+                    </div>
+                    <div class="chat-list" id="chatList">
+                        <!-- Chat items will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                </div>
+                
+                <div class="chat-input-container">
+                    <form id="chatForm" class="chat-form">
+                        <div class="input-wrapper">
+                            <textarea 
+                                id="messageInput" 
+                                class="message-input" 
+                                placeholder="Ask a question..."
+                                rows="1"
+                                maxlength="4000"
+                            ></textarea>
+                            <button type="submit" class="send-button" id="sendButton">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>
+
