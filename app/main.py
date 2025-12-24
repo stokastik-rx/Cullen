@@ -10,8 +10,12 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.logging import setup_logging
+from app.core.database import init_db
 from app.api.v1.router import api_router
 from app.core.exceptions import setup_exception_handlers
+
+# Import models to ensure they are registered with Base
+from app.models import user, chat  # noqa: F401
 
 # Setup logging
 setup_logging()
@@ -19,7 +23,8 @@ setup_logging()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events"""
-    # Startup
+    # Startup - initialize database tables
+    init_db()
     yield
     # Shutdown
     pass

@@ -44,6 +44,15 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="sidebar-section user-card-section">
+                <div class="user-card" id="userCard">
+                    <div class="user-card-content">
+                        <div class="user-name" id="userName">Guest</div>
+                        <div class="user-tier" id="userTier">BASE</div>
+                    </div>
+                </div>
+            </div>
         </aside>
         
         <main class="main-content">
@@ -71,6 +80,53 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Auth Modals -->
+    <div id="signupModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sign Up</h2>
+                <button class="modal-close" id="signupModalClose">&times;</button>
+            </div>
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" name="username" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" required minlength="8">
+                </div>
+                <div id="signupError" class="error-message"></div>
+                <button type="submit" class="modal-submit-btn">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Log In</h2>
+                <button class="modal-close" id="loginModalClose">&times;</button>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginUsername">Username or Email</label>
+                    <input type="text" id="loginUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <div id="loginError" class="error-message"></div>
+                <button type="submit" class="modal-submit-btn">Log In</button>
+            </form>
+        </div>
     </div>
     
     <script src="/static/script.js"></script>
