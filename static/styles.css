@@ -12,12 +12,92 @@ body {
     color: #ececf1;
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Bar Styles */
+.top-bar {
+    width: 100%;
+    background: #000000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.875rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.top-bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+}
+
+.brand-text {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.auth-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: #ececf1;
+}
+
+.auth-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.signup-btn {
+    color: #8e8ea0;
+}
+
+.login-btn {
+    color: #ececf1;
+}
+
+.upgrade-btn {
+    background: #ef4444;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.upgrade-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.auth-btn.hidden {
+    display: none;
 }
 
 .app-container {
     display: flex;
-    height: 100vh;
+    flex: 1;
     width: 100vw;
+    overflow: hidden;
 }
 
 /* Sidebar Styles */
@@ -246,7 +326,7 @@ body {
 
 .message {
     display: block;
-    padding: 1.5rem 0;
+    padding: 1rem 0;
     margin: 0 auto;
     max-width: 768px;
     width: 100%;
@@ -279,6 +359,23 @@ body {
     white-space: pre-wrap;
     padding: 0 2rem;
     color: #ececf1;
+}
+
+.message.user .message-content {
+    width: fit-content;
+    max-width: 85%;
+    padding: 0.875rem 1.125rem;
+    border-radius: 12px;
+    background: #2a2a2a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-left: auto;
+    margin-right: 2rem;
+}
+
+.message.assistant .message-content {
+    padding: 0 2rem;
+    background: transparent;
+    border: none;
 }
 
 .message-content p {
@@ -424,6 +521,24 @@ body {
 
 /* Responsive design */
 @media (max-width: 768px) {
+    .top-bar {
+        padding: 0.75rem 1rem;
+    }
+    
+    .brand-text {
+        font-size: 0.875rem;
+        letter-spacing: 0.2em;
+    }
+    
+    .auth-buttons {
+        gap: 0.5rem;
+    }
+    
+    .auth-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
     .sidebar {
         width: 240px;
     }
@@ -438,6 +553,19 @@ body {
     
     .message-content {
         padding: 0 1rem;
+    }
+    
+    .message.user .message-content {
+        margin-right: 1rem !important;
+        max-width: 90%;
+    }
+    
+    .message.assistant .message-content {
+        padding: 0 1rem;
+    }
+    
+    .typing-indicator {
+        margin: 0 1rem;
     }
     
     .chat-input-container {

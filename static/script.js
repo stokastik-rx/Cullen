@@ -1,6 +1,50 @@
 // Chat Management
 let currentChatId = null;
 let chats = [];
+let isLoggedIn = false;
+
+// Auth State Management
+function checkAuthState() {
+    const savedAuth = localStorage.getItem('isLoggedIn');
+    isLoggedIn = savedAuth === 'true';
+    updateAuthButtons();
+}
+
+function updateAuthButtons() {
+    const signupBtn = document.getElementById('signupBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    if (isLoggedIn) {
+        signupBtn.classList.add('hidden');
+        loginBtn.textContent = 'Log Out';
+    } else {
+        signupBtn.classList.remove('hidden');
+        loginBtn.textContent = 'Log In';
+    }
+}
+
+function handleLogin() {
+    if (isLoggedIn) {
+        // Logout
+        isLoggedIn = false;
+        localStorage.setItem('isLoggedIn', 'false');
+    } else {
+        // Login (placeholder - replace with actual auth)
+        isLoggedIn = true;
+        localStorage.setItem('isLoggedIn', 'true');
+    }
+    updateAuthButtons();
+}
+
+function handleSignup() {
+    // Placeholder - replace with actual signup logic
+    alert('Sign up functionality coming soon!');
+}
+
+function handleUpgrade() {
+    // Placeholder - replace with actual upgrade logic
+    alert('Upgrade functionality coming soon!');
+}
 
 // DOM Elements
 const chatMessages = document.getElementById('chatMessages');
@@ -11,6 +55,7 @@ const newChatBtn = document.getElementById('newChatBtn');
 const chatList = document.getElementById('chatList');
 
 // Initialize
+checkAuthState();
 loadChats();
 if (chats.length > 0) {
     loadChat(chats[0].id);
@@ -30,6 +75,11 @@ if (chats.length > 0) {
     renderChatList();
     clearMessages();
 }
+
+// Auth button event listeners
+document.getElementById('loginBtn').addEventListener('click', handleLogin);
+document.getElementById('signupBtn').addEventListener('click', handleSignup);
+document.getElementById('upgradeBtn').addEventListener('click', handleUpgrade);
 
 // Auto-resize textarea
 messageInput.addEventListener('input', function() {
