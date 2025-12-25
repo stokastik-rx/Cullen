@@ -748,3 +748,57 @@ messageInput.addEventListener('keydown', (e) => {
 window.addEventListener('load', () => {
     messageInput.focus();
 });
+document.addEventListener("DOMContentLoaded", () => {
+  const addInterestBtn = document.getElementById("addInterestBtn");
+  const interestModal = document.getElementById("interestModal");
+  const interestModalClose = document.getElementById("interestModalClose");
+  const interestForm = document.getElementById("interestForm");
+  const interestName = document.getElementById("interestName");
+  const interestContext = document.getElementById("interestContext");
+  const interestError = document.getElementById("interestError");
+  const interestList = document.getElementById("interestList");
+
+  if (!addInterestBtn || !interestModal) {
+    console.warn("Add Interest elements not found. Check IDs in index.html.");
+    return;
+  }
+
+  function openInterestModal() {
+    if (interestError) interestError.textContent = "";
+    if (interestName) interestName.value = "";
+    if (interestContext) interestContext.value = "";
+    interestModal.style.display = "flex";
+    setTimeout(() => interestName?.focus(), 0);
+  }
+
+  function closeInterestModal() {
+    interestModal.style.display = "none";
+  }
+
+  addInterestBtn.addEventListener("click", openInterestModal);
+  interestModalClose?.addEventListener("click", closeInterestModal);
+
+  interestModal.addEventListener("click", (e) => {
+    if (e.target === interestModal) closeInterestModal();
+  });
+
+  interestForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = (interestName?.value || "").trim();
+    const ctx = (interestContext?.value || "").trim();
+
+    if (!name) {
+      if (interestError) interestError.textContent = "Name of Interest is required.";
+      return;
+    }
+
+    const item = document.createElement("div");
+    item.className = "interest-item";
+    item.textContent = name;
+    item.title = ctx;
+
+    interestList?.appendChild(item);
+    closeInterestModal();
+  });
+});
+

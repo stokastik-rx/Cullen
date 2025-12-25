@@ -10,18 +10,24 @@
     <header class="top-bar">
         <div class="top-bar-content">
             <div class="brand">
-                 
                 <span class="brand-text">C U L L E N </span>
                 <img src="/static/images/red-pill.png" alt="Red Pill Logo" class="pill-logo">
                 <span class="brand-text">. A I</span>
             </div>
-            <div class="auth-buttons">
-                <button class="auth-btn signup-btn" id="signupBtn">Sign Up</button>
-                <button class="auth-btn login-btn" id="loginBtn">Log In</button>
-                <button class="auth-btn upgrade-btn" id="upgradeBtn">Upgrade</button>
+
+             <div class="top-actions">
+                <button id="addInterestBtn" class="new-chat-button add-interest-btn">
+                Manage Roster
+              </button>
             </div>
+
+            <div class="auth-buttons">
+             <button class="auth-btn signup-btn" id="signupBtn">Sign Up</button>
+             <button class="auth-btn login-btn" id="loginBtn">Log In</button>
+             <button class="auth-btn upgrade-btn" id="upgradeBtn">Upgrade</button>
+          </div>
         </div>
-    </header>
+      </header>
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-content">
@@ -34,7 +40,9 @@
                 <div class="sidebar-section">
                     <div class="sidebar-header">
                         <span>ROSTER</span>
+                        <div id="interestList" class="interest-list"></div>
                     </div>
+                    <div id="interestList" class="interest-list"></div>
                 </div>
                 
                 <div class="sidebar-section">
@@ -131,8 +139,113 @@
             </form>
         </div>
     </div>
-    
+    <!-- Auth Modals -->
+    <div id="signupModal" class="modal-overlay">
+  ...
+</div>
+
+<div id="loginModal" class="modal-overlay">
+  ...
+</div>
+<!-- Add Interest Modal -->
+<div id="interestModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Add Interest</h2>
+      <button class="modal-close" id="interestModalClose">&times;</button>
+    </div>
+
+    <form id="interestForm" class="auth-form">
+      <div class="form-group">
+        <label for="interestName">Name of Interest <span style="opacity:.75;">*Required Information</span></label>
+        <input type="text" id="interestName" required />
+      </div>
+
+      <div class="form-group">
+        <label for="interestContext">Context / Background Information <span style="opacity:.75;">*optional (can be changed later on)</span></label>
+        <textarea id="interestContext" rows="3"></textarea>
+      </div>
+
+      <div id="interestError" class="error-message"></div>
+
+      <button type="submit" class="modal-submit-btn">Begin</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- Add Interest Modal (PART B GOES HERE) -->
+<div id="interestModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Add Interest</h2>
+      <button class="modal-close" id="interestModalClose">&times;</button>
+    </div>
+
+    <form id="interestForm" class="auth-form">
+      <div class="form-group">
+        <label for="interestName">
+          Name of Interest <span style="opacity:.7;">*Required Information</span>
+        </label>
+        <input type="text" id="interestName" required />
+      </div>
+
+      <div class="form-group">
+        <label for="interestContext">
+          Context / Background Information
+          <span style="opacity:.7;">*optional (can be changed later on)</span>
+        </label>
+        <textarea id="interestContext" rows="3"></textarea>
+      </div>
+
+      <div id="interestError" class="error-message"></div>
+
+      <button type="submit" class="modal-submit-btn">Begin</button>
+    </form>
+  </div>
+</div>
+<!-- Auth Modals -->
+<div id="signupModal" class="modal-overlay">
+  ...
+</div>
+
+<div id="loginModal" class="modal-overlay">
+  ...
+</div>
+
+<!-- Add Interest Modal (PART B GOES HERE) -->
+<div id="interestModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Add Interest</h2>
+      <button class="modal-close" id="interestModalClose">&times;</button>
+    </div>
+
+    <form id="interestForm" class="auth-form">
+      <div class="form-group">
+        <label for="interestName">
+          Name of Interest <span style="opacity:.7;">*Required Information</span>
+        </label>
+        <input type="text" id="interestName" required />
+      </div>
+
+      <div class="form-group">
+        <label for="interestContext">
+          Context / Background Information
+          <span style="opacity:.7;">*optional (can be changed later on)</span>
+        </label>
+        <textarea id="interestContext" rows="3"></textarea>
+      </div>
+
+      <div id="interestError" class="error-message"></div>
+
+      <button type="submit" class="modal-submit-btn">Begin</button>
+    </form>
+  </div>
+</div>
+
     <script src="/static/script.js"></script>
 </body>
 </html>
+
 
