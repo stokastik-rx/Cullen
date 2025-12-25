@@ -803,4 +803,7 @@ body {
     color: #fbbf24;
     border: 1px solid rgba(251, 191, 36, 0.3);
 }
-
+.pill-logo {
+  width: 50px;
+  opacity: 0.95;
+}
