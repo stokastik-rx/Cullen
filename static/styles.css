@@ -724,6 +724,17 @@ body {
     cursor: pointer;
     transition: opacity 0.2s;
     margin-top: 0.5rem;
+}   button,
+.auth-btn,
+.modal-submit-btn {
+  animation: softGlow 4s ease-in infinite;
+}
+
+/* Stronger glow on hover */
+button:hover,
+.auth-btn:hover,
+.modal-submit-btn:hover {
+  box-shadow: 0 0 16px rgba(255, 73, 73, 0.566);
 }
 
 .modal-submit-btn:hover:not(:disabled) {
@@ -806,4 +817,183 @@ body {
 .pill-logo {
   width: 50px;
   opacity: 0.95;
+}
+/* ===== Modal Submit Buttons (Login / Sign Up) ===== */
+
+/* Default: white bg, black text */
+.modal button[type="submit"],
+.modal .auth-submit {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: background 220ms ease, color 220ms ease, transform 120ms ease;
+}
+
+/* Hover: red bg, white text */
+.modal button[type="submit"]:hover,
+.modal .auth-submit:hover {
+  background: #ef4444; /* change to your exact site red if different */
+  color: #ffffff;
+}
+
+/* Optional: press effect */
+.modal button[type="submit"]:active,
+.modal .auth-submit:active {
+  transform: scale(0.99);
+}
+/* ===== FORCE modal submit button theme ===== */
+.modal-overlay .modal-submit-btn {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none !important;
+  border-radius: 10px;
+
+  background: #ffffff !important; /* white */
+  color: #000000 !important;      /* black */
+
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: background-color 250ms ease, color 250ms ease, transform 120ms ease;
+}
+
+.modal-overlay .modal-submit-btn:hover {
+  background-color: #ef4444 !important; /* your red */
+  color: #ffffff !important;
+}
+
+.modal-overlay .modal-submit-btn:active {
+  transform: scale(0.98);
+}
+/* ===== Glow animation ===== */
+@keyframes softGlow {
+  0% {
+    box-shadow: 0 0 0 rgba(255, 59, 59, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 59, 59, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 59, 59, 0);
+  }
+}
+/* ===== Red-rain hover for MODAL submit buttons only ===== */
+@keyframes redNeonShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Normal state (keep whatever you already like) */
+.modal-submit-btn {
+  background: #ff3b3b;   /* normal solid red */
+  color: #ffffff;
+  transition: box-shadow 200ms ease, transform 120ms ease;
+}
+
+/* Hover: red-rain animated gradient */
+.modal-submit-btn:hover {
+  background: linear-gradient(
+    120deg,
+    #5a0000,   /* very dark red */
+    #9b0f0f,   /* dark red */
+    #ff1a1a,   /* bright red */
+    #ff4d4d,   /* neon red */
+    #ff1a1a,
+    #9b0f0f
+  );
+  background-size: 300% 300%;
+  animation: redNeonShift 1.6s linear infinite;
+
+  box-shadow:
+    0 0 10px rgba(255, 60, 60, 0.55),
+    0 0 22px rgba(255, 60, 60, 0.35);
+
+  transform: translateY(-1px);
+}
+/* ===== Modal submit button: white -> animated red-rain on hover ===== */
+@keyframes redNeonShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Default: WHITE bg, BLACK text */
+.modal-overlay button.modal-submit-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
+
+  transition:
+    color 200ms ease,
+    box-shadow 200ms ease,
+    transform 120ms ease;
+}
+
+/* Hover: animated gradient + WHITE text */
+.modal-overlay button.modal-submit-btn:hover {
+  /* IMPORTANT: use background-image (not background) so it can't get stomped */
+  background-image: linear-gradient(
+    120deg,
+    #5a0000,
+    #9b0f0f,
+    #ff1a1a,
+    #ff4d4d,
+    #ff1a1a,
+    #9b0f0f
+  ) !important;
+
+  /* make the gradient big so movement is visible */
+  background-size: 400% 400% !important;
+
+  /* make sure it’s actually moving */
+  background-position: 0% 50% !important;
+  animation: redNeonShift 1.2s linear infinite !important;
+
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 10px rgba(255, 60, 60, 0.55),
+    0 0 22px rgba(255, 60, 60, 0.35) !important;
+
+  transform: translateY(-1px);
+}
+@keyframes redNeonShift {
+  0%   { background-position: 0% 50%, 0% 50%; }
+  100% { background-position: 200% 50%, 0% 50%; }
+}
+
+/* default */
+.modal-overlay button.modal-submit-btn{
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* FORCE animation to run on hover */
+.modal-overlay button.modal-submit-btn:hover{
+  /* two layers: animated gradient + subtle static base */
+  background-image:
+    linear-gradient(90deg,
+      #5a0000 0%,
+      #9b0f0f 20%,
+      #ff1a1a 45%,
+      #ff4d4d 60%,
+      #ff1a1a 75%,
+      #9b0f0f 100%
+    ),
+    linear-gradient(120deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+
+  background-size: 250% 100%, 100% 100% !important;
+  background-repeat: no-repeat !important;
+
+  /* THIS is what makes it move */
+  animation: redNeonShift 0.9s linear infinite !important;
+
+  color: #ffffff !important;
 }
