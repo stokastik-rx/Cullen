@@ -1,0 +1,259 @@
+/* =========================
+   /static/roster.css
+   ROSTER PAGE — Cards + Center Modal (clean + stable)
+   ========================= */
+
+:root{
+  --red: #ef4444;
+  --redDark: #932929;
+  --panel: #111;
+  --border: rgba(255,255,255,0.12);
+}
+
+/* Page scroll (IMPORTANT) */
+.roster-page{
+  min-height: calc(100vh - 70px);
+  padding: 56px 24px;
+  overflow-y: auto;
+}
+
+/* Cards grid */
+.roster-cards{
+  display:flex;
+  gap:56px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* Card base */
+.roster-card{
+  width:320px;
+  height:460px;
+  border-radius:28px;
+  background:#2b2b2b;
+  border:2px solid rgba(255,255,255,0.75);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  will-change: transform;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.roster-card .plus{
+  font-size:64px;
+  color:rgba(255,255,255,0.9);
+  transform:scale(0.9);
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.roster-card[data-state="empty"]:hover{
+  transform:scale(1.06);
+  border-color: rgba(255,80,80,0.95);
+  box-shadow:
+    0 0 28px rgba(255,60,60,0.70),
+    0 0 90px rgba(255,60,60,0.35);
+}
+
+.roster-card[data-state="empty"]:hover .plus{
+  transform:scale(1.18);
+}
+
+/* Filled card */
+.roster-card[data-state="filled"]{
+  background: var(--red);
+  border-color: rgba(255,255,255,0.18);
+  cursor: default;
+  box-shadow:none;
+}
+
+.roster-card[data-state="filled"] .plus{
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Centered content on filled card */
+.card-content{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  padding:30px;
+  text-align:center;
+}
+
+.card-title{
+  color:#fff;
+  font-weight:900;
+  font-size:28px;
+  letter-spacing:0.30em;
+  text-transform:uppercase;
+  line-height:1.2;
+}
+
+.card-sub{
+  margin-top:14px;
+  color:rgba(255,255,255,0.85);
+  font-size:14px;
+  line-height:1.5;
+  max-width:85%;
+}
+
+/* =========================
+   MODAL — Single source of truth
+   ========================= */
+
+#rosterModal{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+}
+
+#rosterModal.is-open{
+  display: grid;
+  place-items: center;
+}
+
+/* Backdrop */
+#rosterModal .modal-backdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.72);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+/* Dialog wrapper */
+#rosterModal .modal-dialog{
+  position: relative;
+  z-index: 1;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow:auto;
+
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  transition: opacity 220ms ease, transform 220ms cubic-bezier(.2,.8,.2,1);
+}
+
+#rosterModal.is-open.is-visible .modal-backdrop{
+  opacity: 1;
+}
+#rosterModal.is-open.is-visible .modal-dialog{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Panel */
+#rosterModal .modal-panel{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.65);
+}
+
+/* Header */
+#rosterModal .modal-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 12px;
+}
+
+#rosterModal .modal-title{
+  font-size: 18px;
+  font-weight: 900;
+  color:#fff;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#rosterModal .modal-close{
+  background: transparent;
+  border:none;
+  color: rgba(255,255,255,0.9);
+  cursor:pointer;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+#rosterModal .modal-close:hover{
+  background: rgba(255,255,255,0.12);
+  transform: scale(1.03);
+}
+
+/* Form */
+#rosterModal .modal-form{
+  display:grid;
+  gap: 14px;
+}
+
+#rosterModal .field{
+  display:grid;
+  gap: 8px;
+}
+
+#rosterModal label{
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.92);
+}
+
+#rosterModal .req{ color: var(--red); }
+
+#rosterModal input,
+#rosterModal textarea{
+  width:100%;
+  box-sizing:border-box;
+  background:#000;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 12px;
+  padding: 12px;
+  color:#fff;
+  outline:none;
+  resize: vertical;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+#rosterModal input:focus,
+#rosterModal textarea:focus{
+  border-color: rgba(239,68,68,0.7);
+  background: #0a0a0a;
+}
+
+/* Actions */
+#rosterModal .modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top: 4px;
+}
+
+#rosterModal .modal-btn{
+  border:none;
+  border-radius:12px;
+  padding: 10px 14px;
+  cursor:pointer;
+  font-weight: 900;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+#rosterModal .modal-btn.cancel{
+  background: rgba(255,255,255,0.10);
+  color:#fff;
+}
+#rosterModal .modal-btn.cancel:hover{
+  background: rgba(255,255,255,0.16);
+  transform: scale(1.02);
+}
+
+#rosterModal .modal-btn.save{
+  background: var(--red);
+  color:#fff;
+}
+#rosterModal .modal-btn.save:hover{
+  background: var(--redDark);
+  transform: scale(1.02);
+}

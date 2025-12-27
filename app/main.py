@@ -54,6 +54,15 @@ setup_exception_handlers(app)
 
 # Mount static files (for frontend)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+from fastapi.responses import FileResponse
+
+@app.get("/roster")
+def roster_page():
+    return FileResponse("static/pages/roster.html")
+
+@app.get("/")
+def chat_page():
+    return FileResponse("static/index.html")
 
 # Include routers
 app.include_router(api_router, prefix=settings.API_V1_STR)

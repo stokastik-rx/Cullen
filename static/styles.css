@@ -1,1060 +1,647 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background: #000000;
-    color: #ececf1;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Top Bar Styles */
-.top-bar {
-    width: 100%;
-    background: #000000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.875rem 2rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.top-bar-content {
-  width: 100%;
-  margin: 0;
-  padding: 0 24px;        /* space from screen edges */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-}
-
-.brand-text {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-}
-
-.auth-buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.auth-btn {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: transparent;
-    color: #ececf1;
-}
-
-.auth-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.signup-btn {
-    color: #8e8ea0;
-}
-
-.login-btn {
-    color: #ececf1;
-}
-
-.upgrade-btn {
-    background: #ef4444;
-    color: #ffffff;
-    font-weight: 600;
-}
-
-.upgrade-btn:hover {
-    background: #dc2626;
-    transform: translateY(-1px);
-}
-
-.auth-btn.hidden {
-    display: none;
-}
-
-.app-container {
-    display: flex;
-    flex: 1;
-    width: 100vw;
-    overflow: hidden;
-}
-
-/* Sidebar Styles */
-.sidebar {
-    width: 260px;
-    background: #171717;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.sidebar-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem 0.5rem 0.5rem;
-    min-height: 0; /* Allows flex shrinking */
-}
-
-.sidebar-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-}
-
-.sidebar-section {
-    margin-bottom: 1rem;
-}
-
-.new-chat-button {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: #ef4444;
-    border: none;
-    border-radius: 8px;
-    color: #ffffff;
-    font-size: 0.875rem;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-/* Make Add Interest button match New Chat */
-.add-interest-btn {
-  margin-left: 1rem; /* spacing from logo */
-}
-
-/* Darker red on hover (same behavior as New Chat) */
-.new-chat-button:hover,
-.add-interest-btn:hover {
-  filter: brightness(0.9);
-}
-
-.new-chat-button:hover {
-    background: #dc2626;
-}
-
-.new-chat-button:active {
-    transform: scale(0.98);
-}
-
-.sidebar-item {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 0.75rem;
-    background: transparent;
-    border: none;
-    border-radius: 6px;
-    color: #ececf1;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: background-color 0.15s;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-item svg {
-    flex-shrink: 0;
-}
-
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #8e8ea0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.sidebar-header-action {
-    background: transparent;
-    border: none;
-    color: #8e8ea0;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0.25rem;
-    line-height: 1;
-    transition: color 0.2s;
-}
-
-.sidebar-header-action:hover {
-    color: #ececf1;
-}
-
-.chat-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.chat-item {
-    padding: 0.75rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    color: #ececf1;
-    transition: background-color 0.2s;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-}
-
-.chat-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.chat-item.active {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.chat-item-title {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.chat-item-delete {
-    opacity: 0;
-    background: transparent;
-    border: none;
-    color: #8e8ea0;
-    cursor: pointer;
-    padding: 0.25rem;
-    font-size: 0.75rem;
-    transition: opacity 0.2s, color 0.2s;
-}
-
-.chat-item:hover .chat-item-delete {
-    opacity: 1;
-}
-
-.chat-item-delete:hover {
-    color: #ececf1;
-}
-
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.chat-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    position: relative;
-    max-width: 768px;
-    margin: 0 auto;
-}
-
-.chat-header {
-    display: none;
-}
-
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 2rem 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    scroll-behavior: smooth;
-}
-
-.chat-messages::-webkit-scrollbar {
-    width: 8px;
-}
-
-.chat-messages::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.chat-messages::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-}
-
-.chat-messages::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.welcome-message {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: #8e8ea0;
-}
-
-.welcome-message p {
-    font-size: 0.95rem;
-}
-
-.message {
-    display: block;
-    padding: 1rem 0;
-    margin: 0 auto;
-    max-width: 768px;
-    width: 100%;
-    animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.message.user {
-    background: transparent;
-}
-
-.message.assistant {
-    background: transparent;
-}
-
-.message-content {
-    width: 100%;
-    line-height: 1.75;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    padding: 0 2rem;
-    color: #ececf1;
-}
-
-.message.user .message-content {
-    width: fit-content;
-    max-width: 85%;
-    padding: 0.875rem 1.125rem;
-    border-radius: 12px;
-    background: #2a2a2a;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-left: auto;
-    margin-right: 2rem;
-}
-
-.message.assistant .message-content {
-    padding: 0 2rem;
-    background: transparent;
-    border: none;
-}
-
-.message-content p {
-    margin-bottom: 0.5rem;
-}
-
-.message-content p:last-child {
-    margin-bottom: 0;
-}
-
-.chat-input-container {
-    padding: 1.5rem 0 2rem;
-    background: transparent;
-    border-top: none;
-    position: sticky;
-    bottom: 0;
-    max-width: 768px;
-    width: 100%;
-    margin: 0 auto;
-}
-
-.chat-form {
-    width: 100%;
-}
-
-.input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: #2a2a2a;
-    border-radius: 24px;
-    padding: 0.75rem 1.25rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    transition: border-color 0.2s, background-color 0.2s;
-    margin: 0 1rem;
-}
-
-.input-wrapper:focus-within {
-    border-color: rgba(255, 255, 255, 0.25);
-    background: #2f2f2f;
-}
-
-.message-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #ececf1;
-    font-size: 1rem;
-    font-family: inherit;
-    resize: none;
-    max-height: 200px;
-    overflow-y: auto;
-    line-height: 1.5;
-    padding: 0;
-    vertical-align: middle;
-}
-
-.message-input::placeholder {
-    color: #8e8ea0;
-}
-
-.message-input::-webkit-scrollbar {
-    width: 6px;
-}
-
-.message-input::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.message-input::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-}
-
-.send-button {
-    background: transparent;
-    border: none;
-    border-radius: 6px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: #8e8ea0;
-    flex-shrink: 0;
-    transition: color 0.2s, transform 0.1s;
-    padding: 0;
-}
-
-.send-button:hover {
-    color: #ececf1;
-}
-
-.send-button:active {
-    transform: scale(0.95);
-}
-
-.send-button:disabled {
-    color: #555;
-    cursor: not-allowed;
-    opacity: 0.4;
-}
-
-.input-footer {
-    display: none;
-}
-
-.typing-indicator {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
-    margin: 0 2rem;
-}
-
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #8e8ea0;
-    animation: typing 1.4s infinite;
-}
-
-.typing-indicator span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes typing {
-    0%, 60%, 100% {
-        transform: translateY(0);
-        opacity: 0.7;
-    }
-    30% {
-        transform: translateY(-10px);
-        opacity: 1;
-    }
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .top-bar {
-        padding: 0.75rem 1rem;
-    }
-    
-    .brand-text {
-        font-size: 0.875rem;
-        letter-spacing: 0.2em;
-    }
-    
-    .auth-buttons {
-        gap: 0.5rem;
-    }
-    
-    .auth-btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.8rem;
-    }
-    
-    .sidebar {
-        width: 240px;
-    }
-    
-    .chat-container {
-        max-width: 100%;
-    }
-    
-    .chat-messages {
-        padding: 1.5rem 0;
-    }
-    
-    .message-content {
-        padding: 0 1rem;
-    }
-    
-    .message.user .message-content {
-        margin-right: 1rem !important;
-        max-width: 90%;
-    }
-    
-    .message.assistant .message-content {
-        padding: 0 1rem;
-    }
-    
-    .typing-indicator {
-        margin: 0 1rem;
-    }
-    
-    .chat-input-container {
-        padding: 1rem 0 1.5rem;
-    }
-    
-    .input-wrapper {
-        margin: 0 0.75rem;
-    }
-    
-    .typing-indicator {
-        margin: 0 1rem;
-    }
-}
-
-@media (max-width: 640px) {
-    .sidebar {
-        position: absolute;
-        left: -260px;
-        z-index: 100;
-        transition: left 0.3s;
-    }
-    
-    .sidebar.open {
-        left: 0;
-    }
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background: #1a1a1a;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 2rem;
-    width: 90%;
-    max-width: 400px;
-    position: relative;
-    transform: scale(0.9);
-    transition: transform 0.3s;
-}
-
-.modal-overlay.active .modal-content {
-    transform: scale(1);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.modal-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #ffffff;
-    margin: 0;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    color: #ececf1;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-
-.modal-close:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.form-group label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #ececf1;
-}
-
-.form-group input {
-    background: #000000;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    padding: 0.75rem;
-    color: #ececf1;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-.error-message {
-    color: #ef4444;
-    font-size: 0.875rem;
-    padding: 0.5rem;
-    background: rgba(239, 68, 68, 0.1);
-    border-radius: 4px;
-    display: none;
-}
-
-.error-message.visible {
-    display: block;
-}
-
-.modal-submit-btn {
-    background: #ffffff;
-    color: #000000;
-    border: none;
-    border-radius: 4px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    margin-top: 0.5rem;
-}   button,
-.auth-btn,
-.modal-submit-btn {
-  animation: softGlow 4s ease-in infinite;
-}
-
-.modal-submit-btn:hover:not(:disabled) {
-    opacity: 0.9;
-}
-
-.modal-submit-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* User Card Styles */
-.user-card-section {
-    flex-shrink: 0;
-    padding: 1rem 0.5rem 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: #171717; /* Match sidebar background */
-}
-
-.user-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 1rem;
-    transition: background 0.2s;
-}
-
-.user-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.user-card-content {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-}
-
-.user-name {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #ececf1;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    flex: 1;
-    min-width: 0; /* Allows text truncation */
-}
-
-.user-tier {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    display: inline-block;
-    flex-shrink: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* Tier-specific colors */
-.user-tier.tier-base {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-    border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.user-tier.tier-pro {
-    background: rgba(168, 85, 247, 0.2);
-    color: #a78bfa;
-    border: 1px solid rgba(168, 85, 247, 0.3);
-}
-
-.user-tier.tier-premium {
-    background: rgba(251, 191, 36, 0.2);
-    color: #fbbf24;
-    border: 1px solid rgba(251, 191, 36, 0.3);
-}
-.pill-logo {
-  width: 50px;
-  opacity: 0.95;
-}
-/* ===== Modal Submit Buttons (Login / Sign Up) ===== */
-
-/* Default: white bg, black text */
-.modal button[type="submit"],
-.modal .auth-submit {
-  width: 100%;
-  padding: 0.85rem 1rem;
-  border: none;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #000000;
-  font-weight: 700;
-  cursor: pointer;
+/* =========================
+   CULLEN.AI — CLEAN THEME
+   Replace entire /static/styles.css
+   ========================= */
 
-  transition: background 220ms ease, color 220ms ease, transform 120ms ease;
-}
+/* -------- Theme Tokens -------- */
+:root{
+  --bg: #000000;
+  --panel: #171717;
+  --panel-2: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.10);
 
-/* Hover: red bg, white text */
-.modal button[type="submit"]:hover,
-.modal .auth-submit:hover {
-  background: #ef4444; /* change to your exact site red if different */
-  color: #ffffff;
-}
+  --text: #ececf1;
+  --muted: #8e8ea0;
 
-/* Optional: press effect */
-.modal button[type="submit"]:active,
-.modal .auth-submit:active {
-  transform: scale(0.99);
-}
-/* ===== FORCE modal submit button theme ===== */
-.modal-overlay .modal-submit-btn {
-  width: 100%;
-  padding: 0.85rem 1rem;
-  border: none !important;
-  border-radius: 10px;
+  --red: #ef4444;
+  --red-dark: #932929;
 
-  background: #ffffff !important; /* white */
-  color: #000000 !important;      /* black */
+  --hover-bg: rgba(255,255,255,0.12); /* chatgpt-ish hover */
+  --radius: 10px;
 
-  font-weight: 700;
-  cursor: pointer;
+  --t-fast: 150ms;
+  --t-med: 220ms;
 
-  transition: background-color 250ms ease, color 250ms ease, transform 120ms ease;
+  --ease: cubic-bezier(.2,.8,.2,1);
 }
 
-.modal-overlay .modal-submit-btn:hover {
-  background-color: #ef4444 !important; /* your red */
-  color: #ffffff !important;
-}
+/* -------- Base Reset -------- */
+*{ margin:0; padding:0; box-sizing:border-box; }
 
-.modal-overlay .modal-submit-btn:active {
-  transform: scale(0.98);
-}
-/* ===== Clean modal submit button (NO glow, NO animation) ===== */
+html, body { height: 100%; }
 
-/* Default state */
-.modal-overlay button.modal-submit-btn {
-  background: #ffffff;
-  color: #000000;
-  border: none;
-  border-radius: 10px;
-  padding: 0.85rem 1rem;
-  font-weight: 700;
-  cursor: pointer;
+body{
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
-  transition: background-color 200ms ease, color 200ms ease;
-}
+  background: var(--bg);
+  color: var(--text);
 
-/* Hover state: simple solid red */
-.modal-overlay button.modal-submit-btn:hover {
-  background-color: #ff3b3b; /* clean red */
-  color: #ffffff;
-}
-.interest-list {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
+  display:flex;
+  flex-direction:column;
 
-.interest-item {
-  padding: 0.45rem 0.6rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.85);
-  background: rgba(255,255,255,0.04);
-  cursor: pointer;
+  /* IMPORTANT: allow pages to scroll when needed */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-.interest-item:hover {
-  background: rgba(255, 59, 59, 0.18);
-  color: #ffffff;
+/* -------- Scrollbar (global theme) -------- */
+*::-webkit-scrollbar{ width: 10px; height: 10px; }
+*::-webkit-scrollbar-track{ background: var(--bg); }
+*::-webkit-scrollbar-thumb{
+  background: var(--red-dark);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
 }
-/* Top bar actions area */
-.top-actions{
-  margin-left: 16px;
-  display: flex;
-  align-items: center;
-}
+*::-webkit-scrollbar-thumb:hover{ background: var(--red); }
 
-/* Prevent Add Interest from inheriting sidebar button sizing */
-.add-interest-btn{
-  width: auto !important;
-  min-width: 160px;
-  padding: 10px 16px !important;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-/* Add Interest in top-right cluster */
-.auth-buttons {
-  display: flex;
-  align-items: center;
-  gap: 14px; /* spacing between all right-side buttons */
-}
+*{ scrollbar-width: thin; scrollbar-color: var(--red-dark) var(--bg); }
 
-/* Make Add Interest look like New Chat but sized for top bar */
-.add-interest-btn {
-  background: #ff3b3b;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-weight: 700;
-  cursor: pointer;
-  line-height: 1;
+/* =========================
+   TOP BAR
+   ========================= */
+.top-bar{
+  width:100%;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  position: sticky;
+  top:0;
+  z-index: 100;
 }
 
-/* Simple darker red on hover */
-.add-interest-btn:hover {
-  background: #d63b3b;
-}
-/* Top bar layout: logo left, Add Interest centered-ish, auth buttons right */
 .top-bar-content{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-/* Keep right buttons grouped */
-.auth-buttons{
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap: 16px;
 }
 
-/* Make Add Interest look like New Chat */
-.add-interest-btn{
-  width: auto !important;
-  min-width: 220px;
-  padding: 10px 18px !important;
-}
-/* Top bar layout */
-.top-bar-content{
-  display: flex;
-  align-items: center;
-}
-
-/* Lock logo to the left */
 .brand{
-  display: flex;
-  align-items: center;
+  display:flex;
+  align-items:center;
+  gap: 10px;
 }
 
-/* Add Interest sits right of logo with spacing */
-.top-actions{
-  margin-left: 50px; /* ← THIS is the spacing you asked for */
-}
-
-/* Keep auth buttons pushed right */
-.auth-buttons{
-  margin-left: auto;
-  display: flex;
-  gap: 14px;
-}
-/* FORCE top bar layout: logo left, Add Interest 50px right, auth far right */
-header.top-bar .top-bar-content{
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-}
-
-header.top-bar .brand{
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 0 !important;
-}
-
-header.top-bar .top-actions{
-  margin-left: 50px !important;
-  flex: 0 0 auto !important;
-}
-
-header.top-bar .auth-buttons{
-  margin-left: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-}
-header.top-bar .top-bar-content{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:flex-start !important;
-}
-
-header.top-bar .top-actions{
-  margin-left:50px !important;
-}
-
-header.top-bar .auth-buttons{
-  margin-left:auto !important;
-  display:flex !important;
-  gap:14px !important;
-}
-/* --- FIX: lock logo/brand to the left --- */
-.top-bar-content{
-  justify-content: flex-start !important;
-}
-
-/* brand must NOT be centered */
-.brand{
-  margin: 0 !important;
-  justify-content: flex-start !important;
-  text-align: left !important;
-}
-
-/* make sure brand items sit in one line */
 .brand-text{
-  white-space: nowrap !important;
+  font-size: 18px;
+  font-weight: 800;
+  color:#fff;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-/* keep pill aligned nicely */
 .pill-logo{
-  display: inline-block !important;
-  vertical-align: middle !important;
+  width: 46px;
+  opacity: 0.95;
+  display:inline-block;
 }
 
+/* Right-side buttons group */
+.auth-buttons{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap: 12px;
+}
 
+/* The “Manage Roster” slot (center-left spacing) */
+.top-actions{
+  margin-left: 50px;  /* keep your 50px spacing */
+  display:flex;
+  align-items:center;
+}
+
+/* =========================
+   BUTTONS (consistent hover)
+   ========================= */
+.auth-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  background: transparent;
+  color: #ffffff;
+
+  border: none;
+  text-decoration:none;
+
+  padding: 8px 12px;
+  border-radius: 10px;
+
+  font-weight: 700;
+  cursor:pointer;
+
+  transition:
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease),
+    filter var(--t-fast) var(--ease);
+}
+
+/* ChatGPT-like hover for normal buttons */
+.auth-btn:hover{
+  background-color: var(--hover-bg);
+  transform: scale(1.03);
+}
+
+/* Sign Up / Log In should be transparent until hover */
+.signup-btn{ color: var(--muted); }
+.login-btn{ color: var(--text); }
+
+/* Upgrade should be solid red */
+.upgrade-btn{
+  background: var(--red);
+  color: #fff;
+  padding: 8px 14px;
+}
+.upgrade-btn:hover{
+  background: var(--red-dark);
+  transform: scale(1.03);
+}
+
+/* Only Manage Roster / Return to Chat should be solid red */
+.manage-roster-btn{
+  background: var(--red);
+  color:#fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+.manage-roster-btn:hover{
+  background: var(--red-dark);
+  transform: scale(1.04);
+}
+
+/* =========================
+   APP LAYOUT
+   ========================= */
+.app-container{
+  display:flex;
+  flex:1;
+  width:100%;
+  min-height: calc(100vh - 70px);
+}
+
+/* =========================
+   SIDEBAR
+   ========================= */
+.sidebar{
+  width:260px;
+  flex: 0 0 260px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  min-height: 0;
+}
+
+.sidebar-content{
+  flex:1;
+  overflow-y:auto;
+  padding: 16px 12px 12px;
+  min-height:0;
+}
+
+.sidebar-section{ margin-bottom: 14px; }
+
+.sidebar-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* THIS IS YOUR "..." button — now matches login/signup hover */
+.sidebar-header-action{
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+
+  padding: 6px 10px;
+  border-radius: 10px;
+
+  transition:
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.sidebar-header-action:hover{
+  background-color: var(--hover-bg);
+  transform: scale(1.03);
+  color: var(--text);
+}
+
+.new-chat-button{
+  width:100%;
+  padding: 12px 14px;
+  background: var(--red);
+  border:none;
+  border-radius: 10px;
+  color:#fff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor:pointer;
+
+  transition:
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease),
+    filter var(--t-fast) var(--ease);
+}
+
+/* Hover: darker + slightly bigger (what you wanted) */
+.new-chat-button:hover{
+  background: var(--red-dark);
+  transform: scale(1.02);
+}
+.new-chat-button:active{ transform: scale(0.99); }
+
+.chat-list{
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+
+.chat-item{
+  padding: 10px 10px;
+  border-radius: 10px;
+  cursor:pointer;
+  font-size: 14px;
+  color: var(--text);
+  background: transparent;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+
+  transition: background-color var(--t-fast) var(--ease);
+}
+.chat-item:hover{ background: rgba(255,255,255,0.06); }
+.chat-item.active{ background: rgba(255,255,255,0.10); }
+
+.chat-item-title{
+  flex:1;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-item-delete{
+  opacity: 0;
+  background: transparent;
+  border:none;
+  color: var(--muted);
+  cursor:pointer;
+  padding: 6px 8px;
+  border-radius: 10px;
+
+  transition:
+    opacity var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.chat-item:hover .chat-item-delete{ opacity: 1; }
+.chat-item-delete:hover{
+  background-color: var(--hover-bg);
+  transform: scale(1.03);
+  color: var(--text);
+}
+
+/* Bottom user card */
+.user-card-section{
+  flex-shrink:0;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.user-card{
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  padding: 12px;
+
+  transition: background-color var(--t-fast) var(--ease);
+}
+.user-card:hover{ background: rgba(255,255,255,0.08); }
+
+.user-card-content{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+}
+
+.user-name{
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  overflow:hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.user-tier{
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.user-tier.tier-base{
+  background: rgba(59,130,246,0.20);
+  color: #60a5fa;
+  border: 1px solid rgba(59,130,246,0.30);
+}
+.user-tier.tier-pro{
+  background: rgba(168,85,247,0.20);
+  color: #a78bfa;
+  border: 1px solid rgba(168,85,247,0.30);
+}
+.user-tier.tier-premium{
+  background: rgba(251,191,36,0.20);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,0.30);
+}
+
+/* =========================
+   MAIN CHAT AREA
+   ========================= */
+.main-content{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width: 0;
+  overflow:hidden;
+}
+
+.chat-container{
+  width:100%;
+  height:100%;
+  max-width: 768px;
+  margin: 0 auto;
+  display:flex;
+  flex-direction:column;
+}
+
+.chat-messages{
+  flex:1;
+  overflow-y:auto;
+  padding: 28px 0;
+  scroll-behavior:smooth;
+}
+
+.message{
+  max-width: 768px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 14px 0;
+  animation: fadeIn 240ms var(--ease);
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; transform: translateY(8px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+.message-content{
+  padding: 0 24px;
+  line-height: 1.75;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.message.user .message-content{
+  width: fit-content;
+  max-width: 85%;
+  margin-left: auto;
+  margin-right: 24px;
+
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+/* Input area */
+.chat-input-container{
+  padding: 18px 0 26px;
+  position: sticky;
+  bottom: 0;
+  background: transparent;
+}
+
+.input-wrapper{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+
+  background: #2a2a2a;
+  border-radius: 999px;
+  padding: 12px 18px;
+  margin: 0 16px;
+
+  border: 1px solid rgba(255,255,255,0.15);
+
+  transition: border-color var(--t-med) var(--ease), background-color var(--t-med) var(--ease);
+}
+
+.input-wrapper:focus-within{
+  border-color: rgba(255,255,255,0.25);
+  background: #2f2f2f;
+}
+
+.message-input{
+  flex:1;
+  background: transparent;
+  border:none;
+  outline:none;
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+  resize:none;
+}
+
+.message-input::placeholder{ color: var(--muted); }
+
+/* THIS IS YOUR SEND ICON BUTTON — now matches login/signup hover */
+.send-button{
+  background: transparent;
+  border:none;
+  cursor:pointer;
+
+  width: 34px;
+  height: 34px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color: var(--muted);
+  border-radius: 10px;
+
+  transition:
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+
+.send-button:hover{
+  background-color: var(--hover-bg);
+  transform: scale(1.03);
+  color: var(--text);
+}
+
+.send-button:active{ transform: scale(0.99); }
+.send-button:disabled{ opacity: 0.4; cursor:not-allowed; }
+
+/* =========================
+   MODAL (auth)
+   ========================= */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.80);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 1000;
+
+  opacity:0;
+  visibility:hidden;
+  transition: opacity var(--t-med) var(--ease), visibility var(--t-med) var(--ease);
+}
+
+.modal-overlay.active{
+  opacity:1;
+  visibility: visible;
+}
+
+.modal-content{
+  width: 92%;
+  max-width: 420px;
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  padding: 22px;
+
+  transform: scale(0.96);
+  transition: transform var(--t-med) var(--ease);
+}
+
+.modal-overlay.active .modal-content{ transform: scale(1); }
+
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 14px;
+}
+
+.modal-header h2{
+  font-size: 20px;
+  font-weight: 800;
+  color:#fff;
+}
+
+.modal-close{
+  background: transparent;
+  border:none;
+  color: var(--text);
+  cursor:pointer;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 10px;
+
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.modal-close:hover{
+  background-color: var(--hover-bg);
+  transform: scale(1.03);
+}
+
+.auth-form{
+  display:flex;
+  flex-direction:column;
+  gap: 14px;
+}
+
+.form-group label{
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.form-group input{
+  background: #000;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 12px 12px;
+  color: var(--text);
+  font-size: 16px;
+
+  transition: border-color var(--t-fast) var(--ease);
+}
+
+.form-group input:focus{
+  outline:none;
+  border-color: rgba(255,255,255,0.30);
+}
+
+.error-message{
+  display:none;
+  color: var(--red);
+  background: rgba(239,68,68,0.10);
+  border: 1px solid rgba(239,68,68,0.18);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.error-message.visible{ display:block; }
+
+/* Modal submit button */
+.modal-submit-btn{
+  width:100%;
+  padding: 12px 14px;
+  border:none;
+  border-radius: 12px;
+  background:#fff;
+  color:#000;
+  font-weight: 900;
+  cursor:pointer;
+
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.modal-submit-btn:hover{
+  background: var(--red);
+  color:#fff;
+  transform: scale(1.01);
+}
+.modal-submit-btn:active{ transform: scale(0.99); }
+.modal-submit-btn:disabled{ opacity: 0.55; cursor:not-allowed; }
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 768px){
+  .top-bar{ padding: 12px 14px; }
+  .brand-text{ font-size: 14px; letter-spacing: 0.22em; }
+  .pill-logo{ width: 38px; }
+  .sidebar{ width: 240px; flex-basis: 240px; }
+}

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Favicon -->
+  <link rel="icon" href="/static/favicon/favicon.ico" sizes="any">
+  <link rel="icon" href="/static/favicon/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png">
+  <link rel="manifest" href="/static/favicon/site.webmanifest">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>C U L L E N . A I</title>
+
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/roster.css" />
+</head>
+
+<body>
+  <header class="top-bar">
+    <div class="top-bar-content roster-topbar">
+      <div class="brand">
+        <span class="brand-text">C U L L E N</span>
+        <img src="/static/images/red-pill.png" alt="Red Pill Logo" class="pill-logo">
+        <span class="brand-text">. A I</span>
+      </div>
+
+      <div class="top-actions">
+        <a class="auth-btn manage-roster-btn" href="/">Return to Chat</a>
+      </div>
+
+      <div class="auth-buttons">
+        <button class="auth-btn signup-btn" id="signupBtn" type="button">Sign Up</button>
+        <button class="auth-btn login-btn" id="loginBtn" type="button">Log In</button>
+        <button class="auth-btn upgrade-btn" id="upgradeBtn" type="button">Upgrade</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <button class="new-chat-button" id="newChatBtn" type="button" onclick="window.location.href='/'">
+            New Chat
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-header">
+            <span>ROSTER</span>
+          </div>
+          <div id="interestList" class="interest-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-header">
+            <span>CHATS</span>
+            <button class="sidebar-header-action" id="chatsMenuBtn" type="button">…</button>
+          </div>
+          <div class="chat-list" id="chatList"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-section user-card-section">
+        <div class="user-card" id="userCard">
+          <div class="user-card-content">
+            <div class="user-name" id="userName">Guest</div>
+            <div class="user-tier" id="userTier">BASE</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section class="roster-page">
+        <section class="roster-cards" id="rosterCards"></section>
+      </section>
+    </main>
+  </div>
+
+  <!-- Roster Modal (ONLY ONE COPY) -->
+  <div id="rosterModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="true"></div>
+
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="rosterModalTitle">
+      <div class="modal-panel">
+        <div class="modal-top">
+          <div class="modal-title" id="rosterModalTitle">Create Card</div>
+          <button type="button" class="modal-close" id="rosterModalClose" aria-label="Close">✕</button>
+        </div>
+
+        <form class="modal-form" id="rosterModalForm">
+          <div class="field">
+            <label for="interestNameInput">Name of Interest <span class="req">*</span></label>
+            <input id="interestNameInput" type="text" placeholder="Required" autocomplete="off" required />
+          </div>
+
+          <div class="field">
+            <label for="interestBgInput">Context / Background Information (optional)</label>
+            <textarea id="interestBgInput" rows="4" placeholder="Optional — can be changed later"></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="modal-btn cancel" id="rosterModalCancel">Cancel</button>
+            <button type="submit" class="modal-btn save" id="rosterModalSave">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPORTANT: this is what makes cards appear -->
+  <script src="/static/roster.js"></script>
+</body>
+</html>

@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Interface</title>
+    <title>C U L L E N . A I</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <!-- Favicon -->
+<link rel="icon" href="/static/favicon/favicon.ico" sizes="any">
+<link rel="icon" href="/static/favicon/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png">
+<link rel="manifest" href="/static/favicon/site.webmanifest">
 </head>
 <body>
     <header class="top-bar">
@@ -14,11 +19,9 @@
                 <img src="/static/images/red-pill.png" alt="Red Pill Logo" class="pill-logo">
                 <span class="brand-text">. A I</span>
             </div>
-
-             <div class="top-actions">
-                <button id="addInterestBtn" class="new-chat-button add-interest-btn">
-                Manage Roster
-              </button>
+            
+            <div class="top-actions">
+              <a class="auth-btn manage-roster-btn" href="/roster">Manage Roster</a>
             </div>
 
             <div class="auth-buttons">
@@ -155,12 +158,6 @@
       <button class="modal-close" id="interestModalClose">&times;</button>
     </div>
 
-    <form id="interestForm" class="auth-form">
-      <div class="form-group">
-        <label for="interestName">Name of Interest <span style="opacity:.75;">*Required Information</span></label>
-        <input type="text" id="interestName" required />
-      </div>
-
       <div class="form-group">
         <label for="interestContext">Context / Background Information <span style="opacity:.75;">*optional (can be changed later on)</span></label>
         <textarea id="interestContext" rows="3"></textarea>
@@ -181,14 +178,6 @@
       <h2>Add Interest</h2>
       <button class="modal-close" id="interestModalClose">&times;</button>
     </div>
-
-    <form id="interestForm" class="auth-form">
-      <div class="form-group">
-        <label for="interestName">
-          Name of Interest <span style="opacity:.7;">*Required Information</span>
-        </label>
-        <input type="text" id="interestName" required />
-      </div>
 
       <div class="form-group">
         <label for="interestContext">
