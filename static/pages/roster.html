@@ -16,6 +16,8 @@
 </head>
 
 <body>
+<script src="/static/roster_shared.js"></script>
+<script src="/static/roster.js"></script>
   <header class="top-bar">
     <div class="top-bar-content roster-topbar">
       <div class="brand">
@@ -65,7 +67,7 @@
         <div class="user-card" id="userCard">
           <div class="user-card-content">
             <div class="user-name" id="userName">Guest</div>
-            <div class="user-tier" id="userTier">BASE</div>
+            <div class="user-tier tier-base" id="userTier">BASE</div>
           </div>
         </div>
       </div>
@@ -101,6 +103,7 @@
           </div>
 
           <div class="modal-actions">
+            <button type="button" class="modal-btn delete" id="rosterModalDelete" style="display:none;">Delete</button>
             <button type="button" class="modal-btn cancel" id="rosterModalCancel">Cancel</button>
             <button type="submit" class="modal-btn save" id="rosterModalSave">Create</button>
           </div>
@@ -109,7 +112,7 @@
     </div>
   </div>
 
-  <!-- IMPORTANT: this is what makes cards appear -->
   <script src="/static/roster.js"></script>
+  <script src="/static/roster_store.js"></script>
 </body>
 </html>

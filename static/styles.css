@@ -1,13 +1,14 @@
 /* =========================
-   CULLEN.AI — CLEAN THEME
+   CULLEN.AI — GLOBAL THEME
    Replace entire /static/styles.css
+   (used by BOTH chat + roster)
    ========================= */
 
-/* -------- Theme Tokens -------- */
 :root{
   --bg: #000000;
+
   --panel: #171717;
-  --panel-2: rgba(255,255,255,0.05);
+  --panel-soft: rgba(255,255,255,0.05);
   --border: rgba(255,255,255,0.10);
 
   --text: #ececf1;
@@ -16,7 +17,7 @@
   --red: #ef4444;
   --red-dark: #932929;
 
-  --hover-bg: rgba(255,255,255,0.12); /* chatgpt-ish hover */
+  --hover-bg: rgba(255,255,255,0.12);
   --radius: 10px;
 
   --t-fast: 150ms;
@@ -25,10 +26,9 @@
   --ease: cubic-bezier(.2,.8,.2,1);
 }
 
-/* -------- Base Reset -------- */
+/* -------- Reset -------- */
 *{ margin:0; padding:0; box-sizing:border-box; }
-
-html, body { height: 100%; }
+html, body{ height:100%; }
 
 body{
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif;
@@ -41,12 +41,11 @@ body{
   display:flex;
   flex-direction:column;
 
-  /* IMPORTANT: allow pages to scroll when needed */
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-x:hidden;
+  overflow-y:auto;
 }
 
-/* -------- Scrollbar (global theme) -------- */
+/* Scrollbar */
 *::-webkit-scrollbar{ width: 10px; height: 10px; }
 *::-webkit-scrollbar-track{ background: var(--bg); }
 *::-webkit-scrollbar-thumb{
@@ -55,7 +54,6 @@ body{
   border: 2px solid var(--bg);
 }
 *::-webkit-scrollbar-thumb:hover{ background: var(--red); }
-
 *{ scrollbar-width: thin; scrollbar-color: var(--red-dark) var(--bg); }
 
 /* =========================
@@ -100,7 +98,12 @@ body{
   display:inline-block;
 }
 
-/* Right-side buttons group */
+.top-actions{
+  margin-left: 50px;
+  display:flex;
+  align-items:center;
+}
+
 .auth-buttons{
   margin-left:auto;
   display:flex;
@@ -108,15 +111,8 @@ body{
   gap: 12px;
 }
 
-/* The “Manage Roster” slot (center-left spacing) */
-.top-actions{
-  margin-left: 50px;  /* keep your 50px spacing */
-  display:flex;
-  align-items:center;
-}
-
 /* =========================
-   BUTTONS (consistent hover)
+   BUTTONS
    ========================= */
 .auth-btn{
   display:inline-flex;
@@ -138,23 +134,20 @@ body{
   transition:
     background-color var(--t-fast) var(--ease),
     transform var(--t-fast) var(--ease),
-    filter var(--t-fast) var(--ease);
+    color var(--t-fast) var(--ease);
 }
 
-/* ChatGPT-like hover for normal buttons */
 .auth-btn:hover{
   background-color: var(--hover-bg);
   transform: scale(1.03);
 }
 
-/* Sign Up / Log In should be transparent until hover */
 .signup-btn{ color: var(--muted); }
 .login-btn{ color: var(--text); }
 
-/* Upgrade should be solid red */
 .upgrade-btn{
   background: var(--red);
-  color: #fff;
+  color:#fff;
   padding: 8px 14px;
 }
 .upgrade-btn:hover{
@@ -162,7 +155,6 @@ body{
   transform: scale(1.03);
 }
 
-/* Only Manage Roster / Return to Chat should be solid red */
 .manage-roster-btn{
   background: var(--red);
   color:#fff;
@@ -182,6 +174,7 @@ body{
   flex:1;
   width:100%;
   min-height: calc(100vh - 70px);
+  overflow:hidden; /* important: prevents page shifting */
 }
 
 /* =========================
@@ -218,7 +211,6 @@ body{
   letter-spacing: 0.08em;
 }
 
-/* THIS IS YOUR "..." button — now matches login/signup hover */
 .sidebar-header-action{
   background: transparent;
   border: none;
@@ -252,17 +244,15 @@ body{
 
   transition:
     background-color var(--t-fast) var(--ease),
-    transform var(--t-fast) var(--ease),
-    filter var(--t-fast) var(--ease);
+    transform var(--t-fast) var(--ease);
 }
-
-/* Hover: darker + slightly bigger (what you wanted) */
 .new-chat-button:hover{
   background: var(--red-dark);
   transform: scale(1.02);
 }
 .new-chat-button:active{ transform: scale(0.99); }
 
+/* Chats list */
 .chat-list{
   display:flex;
   flex-direction:column;
@@ -316,77 +306,171 @@ body{
   color: var(--text);
 }
 
-/* Bottom user card */
-.user-card-section{
-  flex-shrink:0;
-  padding: 12px;
-  border-top: 1px solid var(--border);
-  background: var(--panel);
+/* =========================
+   SIDEBAR ROSTER LIST (shared)
+   - scroll after ~5 items
+   - bold names
+   - supports a 3-dot menu button
+   ========================= */
+.interest-list{
+  margin-top: 6px;
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+
+  max-height: 240px;      /* ~5 rows */
+  overflow-y: auto;
+  padding: 0 6px 6px;
 }
 
-.user-card{
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 12px;
-  padding: 12px;
-
-  transition: background-color var(--t-fast) var(--ease);
-}
-.user-card:hover{ background: rgba(255,255,255,0.08); }
-
-.user-card-content{
+.interest-item{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap: 10px;
+  gap: 8px;
+
+  padding: 8px 8px;
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.04);
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
 
-.user-name{
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--text);
+.interest-item:hover{
+  background: rgba(255,255,255,0.10);
+  transform: scale(1.01);
+}
+
+/* clickable label */
+.interest-item-label,
+.interest-name{
+  flex: 1;
+  min-width: 0;
   overflow:hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
+
+  background: transparent;
+  border:none;
+  color: rgba(255,255,255,0.92);
+  font-weight: 900;       /* bold */
+  font-size: 13px;
+  letter-spacing: 0.02em;
+
+  cursor:pointer;
+  padding: 8px 10px;
+  border-radius: 10px;
+
+  transition: background-color var(--t-fast) var(--ease);
 }
 
-.user-tier{
-  font-size: 12px;
-  font-weight: 800;
-  padding: 4px 8px;
-  border-radius: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.interest-item-label:hover,
+.interest-name:hover{
+  background: rgba(255,255,255,0.08);
 }
 
-.user-tier.tier-base{
-  background: rgba(59,130,246,0.20);
-  color: #60a5fa;
-  border: 1px solid rgba(59,130,246,0.30);
+/* 3 dots */
+.mini-menu,
+.interest-menu{
+  position: relative;
+  flex: 0 0 auto;
 }
-.user-tier.tier-pro{
-  background: rgba(168,85,247,0.20);
-  color: #a78bfa;
-  border: 1px solid rgba(168,85,247,0.30);
+
+.mini-menu-btn,
+.interest-menu-btn{
+  background: transparent;
+  border:none;
+  color: rgba(255,255,255,0.70);
+  cursor:pointer;
+  padding: 6px 10px;
+  border-radius: 10px;
+
+  transition:
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
 }
-.user-tier.tier-premium{
-  background: rgba(251,191,36,0.20);
-  color: #fbbf24;
-  border: 1px solid rgba(251,191,36,0.30);
+
+.mini-menu-btn:hover,
+.interest-menu-btn:hover{
+  background: rgba(255,255,255,0.10);
+  transform: scale(1.03);
+  color: rgba(255,255,255,0.92);
+}
+
+.mini-menu-pop,
+.interest-dropdown{
+  position:absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 160px;
+
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  padding: 6px;
+
+  box-shadow: 0 20px 70px rgba(0,0,0,0.55);
+
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  pointer-events:none;
+
+  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  z-index: 50;
+}
+
+.mini-menu.open .mini-menu-pop,
+.interest-menu.is-open .interest-dropdown{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events:auto;
+}
+
+.mini-menu-item,
+.interest-dropdown button{
+  width:100%;
+  text-align:left;
+  border:none;
+  background: transparent;
+  color: rgba(255,255,255,0.92);
+  font-weight: 900;
+  padding: 10px 10px;
+  border-radius: 10px;
+  cursor:pointer;
+
+  transition: background-color var(--t-fast) var(--ease);
+}
+
+.mini-menu-item:hover,
+.interest-dropdown button:hover{
+  background: rgba(255,255,255,0.10);
+}
+
+.mini-menu-item.danger,
+.interest-dropdown .danger{
+  color: #ff6b6b;
+}
+.mini-menu-item.danger:hover,
+.interest-dropdown .danger:hover{
+  background: rgba(255, 80, 80, 0.18);
 }
 
 /* =========================
-   MAIN CHAT AREA
+   MAIN CONTENT AREA (shared shell)
    ========================= */
 .main-content{
   flex:1;
+  min-width: 0;
   display:flex;
   flex-direction:column;
-  min-width: 0;
   overflow:hidden;
 }
 
+/* =========================
+   CHAT PAGE ONLY
+   (safe because roster page doesn't use these classes)
+   ========================= */
 .chat-container{
   width:100%;
   height:100%;
@@ -435,7 +519,7 @@ body{
   border: 1px solid rgba(255,255,255,0.10);
 }
 
-/* Input area */
+/* bottom input */
 .chat-input-container{
   padding: 18px 0 26px;
   position: sticky;
@@ -455,7 +539,9 @@ body{
 
   border: 1px solid rgba(255,255,255,0.15);
 
-  transition: border-color var(--t-med) var(--ease), background-color var(--t-med) var(--ease);
+  transition:
+    border-color var(--t-med) var(--ease),
+    background-color var(--t-med) var(--ease);
 }
 
 .input-wrapper:focus-within{
@@ -476,7 +562,6 @@ body{
 
 .message-input::placeholder{ color: var(--muted); }
 
-/* THIS IS YOUR SEND ICON BUTTON — now matches login/signup hover */
 .send-button{
   background: transparent;
   border:none;
@@ -507,138 +592,7 @@ body{
 .send-button:active{ transform: scale(0.99); }
 .send-button:disabled{ opacity: 0.4; cursor:not-allowed; }
 
-/* =========================
-   MODAL (auth)
-   ========================= */
-.modal-overlay{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.80);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index: 1000;
-
-  opacity:0;
-  visibility:hidden;
-  transition: opacity var(--t-med) var(--ease), visibility var(--t-med) var(--ease);
-}
-
-.modal-overlay.active{
-  opacity:1;
-  visibility: visible;
-}
-
-.modal-content{
-  width: 92%;
-  max-width: 420px;
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 14px;
-  padding: 22px;
-
-  transform: scale(0.96);
-  transition: transform var(--t-med) var(--ease);
-}
-
-.modal-overlay.active .modal-content{ transform: scale(1); }
-
-.modal-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom: 14px;
-}
-
-.modal-header h2{
-  font-size: 20px;
-  font-weight: 800;
-  color:#fff;
-}
-
-.modal-close{
-  background: transparent;
-  border:none;
-  color: var(--text);
-  cursor:pointer;
-
-  width: 36px;
-  height: 36px;
-
-  border-radius: 10px;
-
-  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
-}
-.modal-close:hover{
-  background-color: var(--hover-bg);
-  transform: scale(1.03);
-}
-
-.auth-form{
-  display:flex;
-  flex-direction:column;
-  gap: 14px;
-}
-
-.form-group label{
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.form-group input{
-  background: #000;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
-  padding: 12px 12px;
-  color: var(--text);
-  font-size: 16px;
-
-  transition: border-color var(--t-fast) var(--ease);
-}
-
-.form-group input:focus{
-  outline:none;
-  border-color: rgba(255,255,255,0.30);
-}
-
-.error-message{
-  display:none;
-  color: var(--red);
-  background: rgba(239,68,68,0.10);
-  border: 1px solid rgba(239,68,68,0.18);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 700;
-}
-.error-message.visible{ display:block; }
-
-/* Modal submit button */
-.modal-submit-btn{
-  width:100%;
-  padding: 12px 14px;
-  border:none;
-  border-radius: 12px;
-  background:#fff;
-  color:#000;
-  font-weight: 900;
-  cursor:pointer;
-
-  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
-}
-
-.modal-submit-btn:hover{
-  background: var(--red);
-  color:#fff;
-  transform: scale(1.01);
-}
-.modal-submit-btn:active{ transform: scale(0.99); }
-.modal-submit-btn:disabled{ opacity: 0.55; cursor:not-allowed; }
-
-/* =========================
-   Responsive
-   ========================= */
+/* Responsive */
 @media (max-width: 768px){
   .top-bar{ padding: 12px 14px; }
   .brand-text{ font-size: 14px; letter-spacing: 0.22em; }
