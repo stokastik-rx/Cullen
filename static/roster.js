@@ -1,11 +1,8 @@
-// =========================
-// /static/roster.js
-// Roster page: cards + modal + menus + persistence (FIXED)
-// =========================
+// /static/roster.js (FULL REPLACE)
 
 (() => {
-  const store = window.RosterStore;
-  const STORAGE_KEY = store?.STORAGE_KEY || "cullen_roster_cards_v1";
+  const auth = window.CullenAuth;
+  if (!auth) return;
 
   const container = document.getElementById("rosterCards");
   const modal = document.getElementById("rosterModal");
@@ -18,19 +15,13 @@
   const saveBtn = document.getElementById("rosterModalSave");
   const titleEl = document.getElementById("rosterModalTitle");
 
-  if (!container || !modal || !modalForm || !nameInput || !bgInput) {
-    console.error("[Roster] Missing required DOM elements.");
-    return;
-  }
+  if (!container || !modal || !modalForm || !nameInput || !bgInput) return;
 
-  // ---------- state ----------
-  let activeCardId = null;
   let modalMode = "create"; // create | edit
+  let activeId = null;
   let isSubmitting = false;
 
-  // ---------- utils ----------
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  const uuid = () => Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
   function escapeHtml(str) {
     return String(str)
@@ -40,50 +31,16 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
   }
-
   function spacedUpper(str) {
     return str.trim().toUpperCase().split("").join(" ");
   }
 
-  function loadCards() {
-    if (store?.loadCards) return store.loadCards();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw) : [];
-      if (!Array.isArray(parsed)) return [];
-      return parsed
-        .filter((x) => x && typeof x.id === "string")
-        .map((x) => ({
-          id: x.id,
-          name: String(x.name || "").trim(),
-          bg: String(x.bg || "").trim(),
-        }))
-        .filter((x) => x.name.length > 0);
-    } catch {
-      return [];
-    }
-  }
-
-  function saveCards(cards) {
-    if (store?.saveCards) store.saveCards(cards);
-    else localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-
-    // Sync sidebar across pages
-    store?.renderSidebar?.();
-    window.dispatchEvent(new CustomEvent("roster:changed"));
-  }
-
-  function getCardById(id) {
-    return loadCards().find((c) => c.id === id) || null;
-  }
-
-  // ---------- modal ----------
-  function openModal({ mode, id, name = "", bg = "" }) {
+  function openModal({ mode, card }) {
     modalMode = mode;
-    activeCardId = id || null;
+    activeId = card?.id ?? null;
 
-    nameInput.value = name;
-    bgInput.value = bg;
+    nameInput.value = card?.name ?? "";
+    bgInput.value = card?.bg ?? "";
 
     if (titleEl) titleEl.textContent = mode === "edit" ? "Edit Card" : "Create Card";
     if (saveBtn) saveBtn.textContent = mode === "edit" ? "Save" : "Create";
@@ -91,7 +48,6 @@
 
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
-
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         modal.classList.add("is-visible");
@@ -101,37 +57,27 @@
   }
 
   function closeModal() {
-    if (!modal.classList.contains("is-open")) return;
-
     modal.classList.remove("is-visible");
     modal.setAttribute("aria-hidden", "true");
-
     const dialog = modal.querySelector(".modal-dialog");
     const done = () => {
       modal.classList.remove("is-open");
-      activeCardId = null;
       modalMode = "create";
+      activeId = null;
     };
-
     if (dialog) {
       dialog.addEventListener("transitionend", done, { once: true });
       setTimeout(done, 320);
-    } else {
-      setTimeout(done, 260);
-    }
+    } else setTimeout(done, 260);
   }
 
-  // ---------- card menus ----------
   function closeAllCardMenus() {
-    container.querySelectorAll(".card-menu.open").forEach((m) => m.classList.remove("open"));
+    container.querySelectorAll(".card-menu.open").forEach(m => m.classList.remove("open"));
   }
-
   document.addEventListener("click", () => closeAllCardMenus());
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAllCardMenus();
-  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAllCardMenus(); });
 
-  function buildCardMenu(cardId) {
+  function buildCardMenu(card) {
     const wrap = document.createElement("div");
     wrap.className = "card-menu";
 
@@ -139,41 +85,41 @@
     btn.type = "button";
     btn.className = "card-menu-btn";
     btn.textContent = "⋯";
-    btn.setAttribute("aria-label", "Card menu");
 
     const pop = document.createElement("div");
     pop.className = "card-menu-pop";
-    pop.innerHTML = `
-      <button type="button" class="card-menu-item" data-action="edit">Edit</button>
-      <button type="button" class="card-menu-item danger" data-action="delete">Delete</button>
-    `;
 
-    btn.addEventListener("click", (e) => {
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "card-menu-item";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", (e) => {
       e.stopPropagation();
-      e.preventDefault();
-      closeAllCardMenus();
-      wrap.classList.toggle("open");
+      wrap.classList.remove("open");
+      openModal({ mode: "edit", card });
     });
 
-    pop.addEventListener("click", (e) => {
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "card-menu-item danger";
+    del.textContent = "Delete";
+    del.addEventListener("click", async (e) => {
       e.stopPropagation();
-      const item = e.target.closest("[data-action]");
-      if (!item) return;
-
-      const action = item.dataset.action;
-
-      if (action === "edit") {
-        const c = getCardById(cardId);
-        if (c) openModal({ mode: "edit", id: c.id, name: c.name, bg: c.bg });
-      }
-
-      if (action === "delete") {
-        const cards = loadCards().filter((c) => c.id !== cardId);
-        saveCards(cards);
-        renderAll();
-      }
-
       wrap.classList.remove("open");
+      await auth.apiFetch(`/api/v1/roster/${card.id}`, { method: "DELETE" });
+      await renderAll();
+      auth.renderSidebarRoster();
+      window.dispatchEvent(new CustomEvent("roster:changed"));
+    });
+
+    pop.appendChild(edit);
+    pop.appendChild(del);
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeAllCardMenus();
+      wrap.classList.toggle("open");
     });
 
     wrap.appendChild(btn);
@@ -181,7 +127,6 @@
     return wrap;
   }
 
-  // ---------- cards ----------
   function makeEmptyCard() {
     const card = document.createElement("div");
     card.className = "roster-card";
@@ -196,20 +141,20 @@
       card.style.transform = "scale(1.03)";
       await wait(80);
       card.style.transform = "";
-      openModal({ mode: "create", id: null });
+      openModal({ mode: "create", card: null });
     });
 
     return card;
   }
 
-  function makeFilledCard({ id, name, bg }) {
+  function makeFilledCard(cardData) {
     const card = document.createElement("div");
     card.className = "roster-card";
     card.dataset.state = "filled";
-    card.dataset.cardId = id;
+    card.dataset.cardId = String(cardData.id);
 
-    const title = spacedUpper(name);
-    const sub = bg ? `<div class="card-sub">${escapeHtml(bg)}</div>` : "";
+    const title = spacedUpper(cardData.name);
+    const sub = cardData.bg ? `<div class="card-sub">${escapeHtml(cardData.bg)}</div>` : "";
 
     card.innerHTML = `
       <div class="card-content">
@@ -218,33 +163,32 @@
       </div>
     `;
 
-    // menu
-    card.appendChild(buildCardMenu(id));
+    card.appendChild(buildCardMenu(cardData));
 
-    // click to edit
-    card.addEventListener("click", () => {
-      const c = getCardById(id);
-      if (c) openModal({ mode: "edit", id: c.id, name: c.name, bg: c.bg });
-    });
-
+    card.addEventListener("click", () => openModal({ mode: "edit", card: cardData }));
     return card;
   }
 
-  function renderAll() {
-    const cards = loadCards();
+  async function renderAll() {
     container.innerHTML = "";
 
-    cards.forEach((c) => container.appendChild(makeFilledCard(c)));
+    const token = auth.getToken();
+    if (!token) {
+      container.appendChild(makeEmptyCard());
+      return;
+    }
 
-    // Exactly ONE empty card always
+    const cards = await auth.apiFetch("/api/v1/roster", { method: "GET" });
+    cards.forEach(c => container.appendChild(makeFilledCard(c)));
+
+    // always exactly ONE empty card
     container.appendChild(makeEmptyCard());
 
-    // sidebar sync
-    store?.renderSidebar?.();
+    // keep sidebar synced
+    auth.renderSidebarRoster();
   }
 
-  // ---------- submit ----------
-  modalForm.addEventListener("submit", (e) => {
+  modalForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
     isSubmitting = true;
@@ -258,76 +202,72 @@
       return;
     }
 
-    const cards = loadCards();
-
-    if (modalMode === "create") {
-      cards.push({ id: uuid(), name, bg });
-      saveCards(cards);
-      renderAll();
-      closeModal();
-    } else if (modalMode === "edit" && activeCardId) {
-      const idx = cards.findIndex((c) => c.id === activeCardId);
-      if (idx !== -1) {
-        cards[idx] = { ...cards[idx], name, bg };
-        saveCards(cards);
-        renderAll();
+    try {
+      if (modalMode === "create") {
+        await auth.apiFetch("/api/v1/roster", {
+          method: "POST",
+          body: JSON.stringify({ name, bg }),
+        });
+      } else if (modalMode === "edit" && activeId) {
+        await auth.apiFetch(`/api/v1/roster/${activeId}`, {
+          method: "PUT",
+          body: JSON.stringify({ name, bg }),
+        });
       }
       closeModal();
+      await renderAll();
+      window.dispatchEvent(new CustomEvent("roster:changed"));
+    } finally {
+      setTimeout(() => (isSubmitting = false), 80);
     }
-
-    setTimeout(() => (isSubmitting = false), 60);
   });
 
-  // delete (modal)
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", () => {
-      if (!activeCardId) return;
-      const cards = loadCards().filter((c) => c.id !== activeCardId);
-      saveCards(cards);
-      renderAll();
-      closeModal();
-    });
-  }
-
-  // close controls
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
-  if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-
-  modal.addEventListener("click", (e) => {
-    if (e.target?.dataset?.close === "true") closeModal();
+  deleteBtn?.addEventListener("click", async () => {
+    if (!activeId) return;
+    await auth.apiFetch(`/api/v1/roster/${activeId}`, { method: "DELETE" });
+    closeModal();
+    await renderAll();
+    window.dispatchEvent(new CustomEvent("roster:changed"));
   });
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
-  });
+  closeBtn?.addEventListener("click", closeModal);
+  cancelBtn?.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target?.dataset?.close === "true") closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal(); });
 
-  // allow sidebar "edit" to open modal (roster page only)
-  window.addEventListener("roster:edit", (e) => {
-    const id = e.detail?.id;
-    const c = id ? getCardById(id) : null;
-    if (c) openModal({ mode: "edit", id: c.id, name: c.name, bg: c.bg });
-  });
-
-  // query support
-  function handleQuery() {
+  function handleQuery(cards) {
     const sp = new URLSearchParams(window.location.search);
     const editId = sp.get("edit");
     const focusId = sp.get("focus");
 
     if (editId) {
-      const c = getCardById(editId);
-      if (c) openModal({ mode: "edit", id: c.id, name: c.name, bg: c.bg });
+      const c = cards.find(x => String(x.id) === String(editId));
+      if (c) openModal({ mode: "edit", card: c });
     } else if (focusId) {
       setTimeout(() => {
-        const el = container.querySelector(`[data-card-id="${CSS.escape(focusId)}"]`);
+        const el = container.querySelector(`[data-card-id="${CSS.escape(String(focusId))}"]`);
         if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 120);
     }
   }
 
   // init
-  modal.classList.remove("is-open", "is-visible");
-  modal.setAttribute("aria-hidden", "true");
-  renderAll();
-  handleQuery();
+  (async () => {
+    modal.classList.remove("is-open", "is-visible");
+    modal.setAttribute("aria-hidden", "true");
+
+    const token = auth.getToken();
+    if (!token) {
+      container.innerHTML = "";
+      container.appendChild(makeEmptyCard());
+      return;
+    }
+
+    const cards = await auth.apiFetch("/api/v1/roster", { method: "GET" });
+    container.innerHTML = "";
+    cards.forEach(c => container.appendChild(makeFilledCard(c)));
+    container.appendChild(makeEmptyCard());
+    auth.renderSidebarRoster();
+    handleQuery(cards);
+  })();
 })();

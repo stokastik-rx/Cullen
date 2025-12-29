@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.dependencies import get_current_active_user
+from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.chat import Chat, ChatCreate, ChatUpdate, ChatMessage
 from app.services.chat_service import ChatService
@@ -28,7 +28,7 @@ class ChatResponse(BaseModel):
 
 @router.get("", response_model=List[Chat], status_code=status.HTTP_200_OK)
 async def list_chats(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -42,7 +42,7 @@ async def list_chats(
 @router.get("/{chat_id}", response_model=Chat, status_code=status.HTTP_200_OK)
 async def get_chat(
     chat_id: int,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -62,7 +62,7 @@ async def get_chat(
 
 @router.post("", response_model=Chat, status_code=status.HTTP_201_CREATED)
 async def create_chat(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -77,7 +77,7 @@ async def create_chat(
 async def update_chat(
     chat_id: int,
     chat_data: ChatUpdate,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -98,7 +98,7 @@ async def update_chat(
 @router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_chat(
     chat_id: int,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -117,7 +117,7 @@ async def delete_chat(
 @router.post("/message", response_model=ChatResponse, status_code=status.HTTP_200_OK)
 async def send_message(
     request: ChatRequest,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """

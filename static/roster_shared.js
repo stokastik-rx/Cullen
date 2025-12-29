@@ -1,147 +1,179 @@
-// =========================
-// /static/roster_shared.js
-// Shared roster storage + sidebar rendering (all pages)
-// =========================
+// /static/roster_shared.js (FULL REPLACE)
 
 (() => {
-  const STORAGE_KEY = "cullen_roster_cards_v1";
+  const API = {
+    signup: "/api/v1/auth/signup",
+    login: "/api/v1/auth/login",
+    roster: "/api/v1/roster",
+  };
 
-  function safeParse(raw) {
-    try { return JSON.parse(raw); } catch { return null; }
+  const TOKEN_KEY = "cullen_jwt_v1";
+  const USER_KEY = "cullen_user_v1";
+
+  function getToken() {
+    return localStorage.getItem(TOKEN_KEY) || "";
+  }
+  function setToken(token) {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  }
+  function getUser() {
+    try { return JSON.parse(localStorage.getItem(USER_KEY) || "null"); }
+    catch { return null; }
+  }
+  function setUser(u) {
+    if (u) localStorage.setItem(USER_KEY, JSON.stringify(u));
+    else localStorage.removeItem(USER_KEY);
   }
 
-  function loadCards() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? safeParse(raw) : null;
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter((x) => x && typeof x.id === "string")
-      .map((x) => ({
-        id: String(x.id),
-        name: String(x.name || "").trim(),
-        bg: String(x.bg || "").trim(),
-      }))
-      .filter((x) => x.name.length > 0);
+  async function apiFetch(url, opts = {}) {
+    const headers = Object.assign({}, opts.headers || {});
+    const token = getToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    if (!headers["Content-Type"] && opts.body) headers["Content-Type"] = "application/json";
+
+    const res = await fetch(url, { ...opts, headers });
+    if (!res.ok) {
+      let msg = "Request failed";
+      try {
+        const data = await res.json();
+        msg = data?.detail || msg;
+      } catch {}
+      throw new Error(msg);
+    }
+    if (res.status === 204) return null;
+    return res.json();
   }
 
-  function saveCards(cards) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  // ---------- UI helpers ----------
+  function qs(id) { return document.getElementById(id); }
+
+  function setTierBadge(tier) {
+    const el = qs("userTier");
+    if (!el) return;
+    el.textContent = (tier || "BASE").toUpperCase();
+    el.classList.remove("tier-base", "tier-pro", "tier-premium");
+    // for now keep BASE styling
+    el.classList.add("tier-base");
   }
 
-  function deleteCard(id) {
-    const cards = loadCards().filter((c) => c.id !== id);
-    saveCards(cards);
-    renderSidebar(); // refresh sidebar everywhere
-    // notify roster page (if open)
-    window.dispatchEvent(new CustomEvent("roster:changed"));
-  }
-
-  function renderSidebar() {
-    const list = document.getElementById("interestList");
-    if (!list) return;
-
-    const cards = loadCards();
-    list.innerHTML = "";
-
-    for (const c of cards) {
-      const row = document.createElement("div");
-      row.className = "interest-item";
-      row.dataset.cardId = c.id;
-
-      const label = document.createElement("button");
-      label.type = "button";
-      label.className = "interest-item-label";
-      label.textContent = c.name;
-
-      // If we're on roster page, scroll to it. Otherwise, go to roster and open edit.
-      label.addEventListener("click", () => {
-        const onRosterPage = !!document.getElementById("rosterCards");
-        if (onRosterPage) {
-          const el = document.querySelector(`[data-card-id="${CSS.escape(c.id)}"]`);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        } else {
-          window.location.href = `/roster?focus=${encodeURIComponent(c.id)}`;
-        }
-      });
-
-      const menuWrap = document.createElement("div");
-      menuWrap.className = "mini-menu";
-
-      const menuBtn = document.createElement("button");
-      menuBtn.type = "button";
-      menuBtn.className = "mini-menu-btn";
-      menuBtn.textContent = "⋯";
-      menuBtn.setAttribute("aria-label", "Roster item menu");
-
-      const menu = document.createElement("div");
-      menu.className = "mini-menu-pop";
-      menu.innerHTML = `
-        <button type="button" class="mini-menu-item" data-action="edit">Edit</button>
-        <button type="button" class="mini-menu-item danger" data-action="delete">Delete</button>
-      `;
-
-      menuBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        closeAllMiniMenus();
-        menuWrap.classList.toggle("open");
-      });
-
-      menu.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-action]");
-        if (!btn) return;
-        const action = btn.dataset.action;
-
-        if (action === "edit") {
-          // If roster page exists, let roster.js open modal directly via event.
-          const onRosterPage = !!document.getElementById("rosterCards");
-          if (onRosterPage) {
-            window.dispatchEvent(new CustomEvent("roster:edit", { detail: { id: c.id } }));
-          } else {
-            window.location.href = `/roster?edit=${encodeURIComponent(c.id)}`;
-          }
-        }
-
-        if (action === "delete") {
-          deleteCard(c.id);
-        }
-
-        menuWrap.classList.remove("open");
-      });
-
-      menuWrap.appendChild(menuBtn);
-      menuWrap.appendChild(menu);
-
-      row.appendChild(label);
-      row.appendChild(menuWrap);
-      list.appendChild(row);
+  function setUserCard(user) {
+    const nameEl = qs("userName");
+    const logoutBtn = qs("logoutBtn");
+    if (user?.username) {
+      if (nameEl) nameEl.textContent = user.username;
+      setTierBadge(user.tier || "BASE");
+      if (logoutBtn) logoutBtn.style.display = "inline-flex";
+    } else {
+      if (nameEl) nameEl.textContent = "Guest";
+      setTierBadge("BASE");
+      if (logoutBtn) logoutBtn.style.display = "none";
     }
   }
 
-  function closeAllMiniMenus() {
-    document.querySelectorAll(".mini-menu.open").forEach((el) => el.classList.remove("open"));
+  // ---------- Sidebar roster render ----------
+  function closeAllMiniMenus(root) {
+    (root || document).querySelectorAll(".mini-menu.open").forEach(m => m.classList.remove("open"));
   }
 
-  // Close menus on outside click / ESC
-  document.addEventListener("click", () => closeAllMiniMenus());
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAllMiniMenus();
-  });
+  function makeSidebarRow(card) {
+    const row = document.createElement("div");
+    row.className = "interest-item";
 
-  // Re-render if another tab changes localStorage
-  window.addEventListener("storage", (e) => {
-    if (e.key === STORAGE_KEY) renderSidebar();
-  });
+    const label = document.createElement("button");
+    label.type = "button";
+    label.className = "interest-item-label";
+    label.textContent = card.name;
+    label.addEventListener("click", () => {
+      // go to roster and focus this card
+      window.location.href = `/roster?focus=${encodeURIComponent(card.id)}`;
+    });
 
-  // Public API
-  window.RosterStore = {
-    STORAGE_KEY,
-    loadCards,
-    saveCards,
-    deleteCard,
-    renderSidebar,
+    const menuWrap = document.createElement("div");
+    menuWrap.className = "mini-menu";
+
+    const menuBtn = document.createElement("button");
+    menuBtn.type = "button";
+    menuBtn.className = "mini-menu-btn";
+    menuBtn.textContent = "⋯";
+    menuBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeAllMiniMenus(document);
+      menuWrap.classList.toggle("open");
+    });
+
+    const pop = document.createElement("div");
+    pop.className = "mini-menu-pop";
+
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "mini-menu-item";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => {
+      window.location.href = `/roster?edit=${encodeURIComponent(card.id)}`;
+    });
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "mini-menu-item danger";
+    del.textContent = "Delete";
+    del.addEventListener("click", async () => {
+      await apiFetch(`${API.roster}/${card.id}`, { method: "DELETE" });
+      await renderSidebarRoster();
+      window.dispatchEvent(new CustomEvent("roster:changed"));
+    });
+
+    pop.appendChild(edit);
+    pop.appendChild(del);
+
+    menuWrap.appendChild(menuBtn);
+    menuWrap.appendChild(pop);
+
+    row.appendChild(label);
+    row.appendChild(menuWrap);
+
+    return row;
+  }
+
+  async function renderSidebarRoster() {
+    const list = qs("interestList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      const cards = await apiFetch(API.roster, { method: "GET" });
+      cards.forEach(c => list.appendChild(makeSidebarRow(c)));
+    } catch (e) {
+      // if token invalid, auto logout
+      setToken("");
+      setUser(null);
+      setUserCard(null);
+    }
+  }
+
+  document.addEventListener("click", () => closeAllMiniMenus(document));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAllMiniMenus(document); });
+
+  // expose for other scripts
+  window.CullenAuth = {
+    getToken,
+    setToken,
+    getUser,
+    setUser,
+    apiFetch,
+    renderSidebarRoster,
+    setUserCard,
   };
 
-  // initial
-  renderSidebar();
+  // initial paint
+  setUserCard(getUser());
+  renderSidebarRoster();
+
+  // re-render if roster changed (from roster page)
+  window.addEventListener("roster:changed", renderSidebarRoster);
 })();

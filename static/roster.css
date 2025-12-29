@@ -1,32 +1,25 @@
 /* =========================
-   /static/roster.css
-   ROSTER PAGE — Cards + Modal + Card Menu
-   Replace entire file
+   /static/roster.css (FULL REPLACE)
    ========================= */
-
 :root{
-  --card: #2b2b2b;
-  --red: #ef4444;
-  --redDark: #932929;
-
+  --card:#2b2b2b;
+  --text:#ececf1;
+  --red:#ef4444;
+  --redDark:#932929;
   --border: rgba(255,255,255,0.22);
   --borderSoft: rgba(255,255,255,0.14);
-
   --shadow: 0 20px 80px rgba(0,0,0,0.65);
-
   --ease: cubic-bezier(.2,.8,.2,1);
   --t-fast: 150ms;
   --t-med: 220ms;
 }
 
-/* page */
 .roster-page{
   min-height: calc(100vh - 70px);
   padding: 56px 24px;
   overflow-y: auto;
 }
 
-/* cards layout */
 .roster-cards{
   display:flex;
   gap:56px;
@@ -35,7 +28,6 @@
   flex-wrap:wrap;
 }
 
-/* card */
 .roster-card{
   width:320px;
   height:460px;
@@ -44,35 +36,23 @@
   border:2px solid var(--border);
   display:grid;
   place-items:center;
-
   cursor:pointer;
-  position: relative;
-  will-change: transform;
-
-  transition:
-    transform var(--t-med) var(--ease),
-    box-shadow var(--t-med) var(--ease),
-    border-color var(--t-med) var(--ease);
+  position:relative;
+  transition: transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease), border-color var(--t-med) var(--ease);
+  animation: cardIn 240ms var(--ease);
 }
 
-/* entry animation helpers (optional) */
-.roster-card.is-entering{ transform: scale(0.96); opacity: 0; }
-.roster-card.is-entered{
-  transform: scale(1);
-  opacity: 1;
-  transition: transform var(--t-med) var(--ease), opacity var(--t-med) var(--ease);
+@keyframes cardIn{
+  from{opacity:0; transform: translateY(10px) scale(.98);}
+  to{opacity:1; transform: translateY(0) scale(1);}
 }
 
-/* empty hover */
 .roster-card[data-state="empty"]:hover{
-  transform: scale(1.06);
-  border-color: rgba(255, 80, 80, 0.95);
-  box-shadow:
-    0 0 28px rgba(255, 60, 60, 0.70),
-    0 0 90px rgba(255, 60, 60, 0.35);
+  transform:scale(1.06);
+  border-color: rgba(255,80,80,0.95);
+  box-shadow: 0 0 28px rgba(255,60,60,0.70), 0 0 90px rgba(255,60,60,0.35);
 }
 
-/* plus */
 .roster-card .plus{
   font-size:64px;
   line-height:1;
@@ -80,23 +60,15 @@
   transform: scale(0.9);
   transition: transform var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease);
 }
-.roster-card[data-state="empty"]:hover .plus{
-  transform: scale(1.18);
-}
+.roster-card[data-state="empty"]:hover .plus{ transform: scale(1.18); }
 
-/* filled card = grey background with red outline */
 .roster-card[data-state="filled"]{
-  background: var(--card);
   border-color: var(--red);
   cursor: default;
-  box-shadow: none;
+  box-shadow:none;
 }
-.roster-card[data-state="filled"] .plus{
-  opacity:0;
-  pointer-events:none;
-}
+.roster-card[data-state="filled"] .plus{ opacity:0; pointer-events:none; }
 
-/* content */
 .card-content{
   width:100%;
   height:100%;
@@ -123,239 +95,160 @@
   max-width: 85%;
 }
 
-/* =========================
-   Card 3-dot menu
-   (JS toggles .open)
-   ========================= */
+/* Card 3-dot menu */
 .card-menu{
   position:absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
-  display:none; /* only show on filled cards */
+  top:12px;
+  right:12px;
+  z-index:5;
+  display:none;
 }
 .roster-card[data-state="filled"] .card-menu{ display:block; }
 
 .card-menu-btn{
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.12);
+  width:38px;height:38px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.12);
   background: rgba(0,0,0,0.35);
   color: rgba(255,255,255,0.85);
-  cursor: pointer;
-
-  transition:
-    transform var(--t-fast) var(--ease),
-    background-color var(--t-fast) var(--ease),
-    border-color var(--t-fast) var(--ease);
+  cursor:pointer;
+  transition: transform 150ms ease, background-color 150ms ease, border-color 150ms ease;
 }
-
 .card-menu-btn:hover{
   background: rgba(255,255,255,0.10);
   transform: scale(1.04);
   border-color: rgba(255,255,255,0.22);
 }
-
 .card-menu-pop{
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  min-width: 160px;
-
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 14px;
-  padding: 6px;
-
+  position:absolute;
+  right:0;
+  top:calc(100% + 8px);
+  min-width:160px;
+  background:#111;
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:14px;
+  padding:6px;
   box-shadow: 0 20px 70px rgba(0,0,0,0.55);
-
-  opacity: 0;
+  opacity:0;
   transform: translateY(-6px) scale(0.98);
-  pointer-events: none;
-
+  pointer-events:none;
   transition: opacity 160ms ease, transform 160ms ease;
 }
-
 .card-menu.open .card-menu-pop{
-  opacity: 1;
+  opacity:1;
   transform: translateY(0) scale(1);
-  pointer-events: auto;
+  pointer-events:auto;
 }
-
 .card-menu-item{
   width:100%;
   text-align:left;
-  background: transparent;
-  border: none;
+  background:transparent;
+  border:none;
   color: rgba(255,255,255,0.92);
-  font-weight: 900;
-  padding: 10px 10px;
-  border-radius: 12px;
-  cursor: pointer;
+  font-weight:900;
+  padding:10px 10px;
+  border-radius:12px;
+  cursor:pointer;
   transition: background-color 150ms ease;
 }
 .card-menu-item:hover{ background: rgba(255,255,255,0.10); }
-.card-menu-item.danger{ color: #ff6b6b; }
-.card-menu-item.danger:hover{ background: rgba(255, 80, 80, 0.18); }
+.card-menu-item.danger{ color:#ff6b6b; }
+.card-menu-item.danger:hover{ background: rgba(255,80,80,0.18); }
 
-/* =========================
-   Modal (centered + animated)
-   ========================= */
+/* Roster modal (the one inside roster.html) */
 #rosterModal{
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:none;
 }
 #rosterModal.is-open{
-  display: grid;
-  place-items: center;
+  display:grid;
+  place-items:center;
 }
-
 #rosterModal .modal-backdrop{
   position:absolute;
   inset:0;
   background: rgba(0,0,0,0.72);
-  opacity: 0;
+  opacity:0;
   transition: opacity var(--t-med) var(--ease);
 }
-
 #rosterModal .modal-dialog{
-  position: relative;
-  z-index: 1;
-
-  width: min(520px, calc(100vw - 32px));
+  position:relative;
+  z-index:1;
+  width:min(520px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
   overflow:auto;
-
-  opacity: 0;
+  opacity:0;
   transform: translateY(14px) scale(0.96);
   transition: opacity var(--t-med) var(--ease), transform var(--t-med) var(--ease);
 }
-
-#rosterModal.is-open.is-visible .modal-backdrop{ opacity: 1; }
+#rosterModal.is-open.is-visible .modal-backdrop{ opacity:1; }
 #rosterModal.is-open.is-visible .modal-dialog{
-  opacity: 1;
+  opacity:1;
   transform: translateY(0) scale(1);
 }
-
 #rosterModal .modal-panel{
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 16px;
-  padding: 18px;
+  background:#111;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px;
+  padding:18px;
   box-shadow: var(--shadow);
 }
-
 #rosterModal .modal-top{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  margin-bottom: 12px;
+  margin-bottom:12px;
 }
-
 #rosterModal .modal-title{
-  font-size: 18px;
-  font-weight: 900;
+  font-size:18px;
+  font-weight:900;
   color:#fff;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing:.14em;
+  text-transform:uppercase;
 }
-
 #rosterModal .modal-close{
-  background: transparent;
+  background:transparent;
   border:none;
-  color: rgba(255,255,255,0.9);
+  color:rgba(255,255,255,0.9);
   cursor:pointer;
-  padding: 8px 10px;
-  border-radius: 10px;
+  padding:8px 10px;
+  border-radius:10px;
   transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
 #rosterModal .modal-close:hover{
   background: rgba(255,255,255,0.12);
   transform: scale(1.03);
 }
-
-/* form */
-#rosterModal .modal-form{
-  display:grid;
-  gap: 14px;
-}
-
-#rosterModal .field{
-  display:grid;
-  gap: 8px;
-}
-
-#rosterModal label{
-  font-size: 13px;
-  font-weight: 900;
-  color: rgba(255,255,255,0.92);
-}
-
+#rosterModal .modal-form{ display:grid; gap:14px; }
+#rosterModal .field{ display:grid; gap:8px; }
+#rosterModal label{ font-size:13px; font-weight:900; color:rgba(255,255,255,0.92); }
 #rosterModal .req{ color: var(--red); }
-
 #rosterModal input,
 #rosterModal textarea{
   width:100%;
-  box-sizing:border-box;
   background:#000;
-  border: 1px solid rgba(255,255,255,0.16);
-  border-radius: 12px;
-  padding: 12px;
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:12px;
+  padding:12px;
   color:#fff;
   outline:none;
-  resize: vertical;
-  transition: border-color var(--t-med) var(--ease), background-color var(--t-med) var(--ease);
+  resize:vertical;
 }
-
-#rosterModal input:focus,
-#rosterModal textarea:focus{
-  border-color: rgba(239,68,68,0.7);
-  background: #0a0a0a;
-}
-
-#rosterModal .modal-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top: 4px;
-}
-
+#rosterModal .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:4px; }
 #rosterModal .modal-btn{
   border:none;
   border-radius:12px;
-  padding: 10px 14px;
+  padding:10px 14px;
   cursor:pointer;
-  font-weight: 900;
+  font-weight:900;
   transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
-
-#rosterModal .modal-btn.cancel{
-  background: rgba(255,255,255,0.10);
-  color:#fff;
-}
-#rosterModal .modal-btn.cancel:hover{
-  background: rgba(255,255,255,0.16);
-  transform: scale(1.02);
-}
-
-#rosterModal .modal-btn.save{
-  background: var(--red);
-  color:#fff;
-}
-#rosterModal .modal-btn.save:hover{
-  background: var(--redDark);
-  transform: scale(1.02);
-}
-
-#rosterModal .modal-btn.delete{
-  background: rgba(255, 80, 80, 0.14);
-  color: #ff6b6b;
-}
-#rosterModal .modal-btn.delete:hover{
-  background: rgba(255, 80, 80, 0.20);
-  transform: scale(1.02);
-}
+#rosterModal .modal-btn.cancel{ background: rgba(255,255,255,0.10); color:#fff; }
+#rosterModal .modal-btn.cancel:hover{ background: rgba(255,255,255,0.16); transform: scale(1.02); }
+#rosterModal .modal-btn.save{ background: var(--red); color:#fff; }
+#rosterModal .modal-btn.save:hover{ background: var(--redDark); transform: scale(1.02); }
+#rosterModal .modal-btn.delete{ background: rgba(239,68,68,0.16); color:#ffb4b4; }
+#rosterModal .modal-btn.delete:hover{ background: rgba(239,68,68,0.22); transform: scale(1.02); }
