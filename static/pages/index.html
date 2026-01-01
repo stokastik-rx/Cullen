@@ -1,16 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>C U L L E N . A I</title>
 
+  <link rel="stylesheet" href="/static/styles.css?v=6">
+
+  <!-- Favicon -->
   <link rel="icon" href="/static/favicon/favicon.ico" sizes="any">
   <link rel="icon" href="/static/favicon/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png">
   <link rel="manifest" href="/static/favicon/site.webmanifest">
-
-  <link rel="stylesheet" href="/static/styles.css" />
 </head>
 
 <body>
@@ -20,17 +21,23 @@
         <span class="brand-text">C U L L E N</span>
         <img src="/static/images/red-pill.png" alt="Red Pill Logo" class="pill-logo">
         <span class="brand-text">. A I</span>
+        <span class="brand-text version-number">V 1.0</span>
+      </div>
+
+      <!-- Active roster filter display -->
+      <div class="roster-filter-header" id="rosterFilterHeader" style="display: none;">
+        <span class="roster-filter-name" id="rosterFilterName"></span>
       </div>
 
       <div class="top-actions">
-        <a class="auth-btn manage-roster-btn" href="/roster">Manage Roster</a>
+        <!-- Roster feature disabled - placeholder to preserve spacing -->
+        <div style="width: 0; height: 0; visibility: hidden;"></div>
       </div>
 
       <div class="auth-buttons">
         <button class="auth-btn signup-btn" id="signupBtn" type="button">Sign Up</button>
         <button class="auth-btn login-btn" id="loginBtn" type="button">Log In</button>
         <button class="auth-btn upgrade-btn" id="upgradeBtn" type="button">Upgrade</button>
-        <button class="auth-btn" id="logoutBtn" type="button" style="display:none;">Log Out</button>
       </div>
     </div>
   </header>
@@ -39,21 +46,44 @@
     <aside class="sidebar">
       <div class="sidebar-content">
         <div class="sidebar-section">
-          <button class="new-chat-button" id="newChatBtn" type="button">New Chat</button>
+          <button class="new-chat-button" id="newChatBtn" type="button">
+            <img src="/static/images/new_chat.png" alt="New Chat" class="button-icon">
+            <span>New chat</span>
+          </button>
+          <button class="search-chat-button" id="searchChatBtn" type="button">
+            <img src="/static/images/search.png" alt="Search" class="button-icon">
+            <span>Search chats</span>
+          </button>
         </div>
 
-        <div class="sidebar-section">
+        <!-- Roster feature disabled - placeholder to preserve spacing -->
+        <div class="sidebar-section" style="display: none;">
           <div class="sidebar-header">
             <span>ROSTER</span>
           </div>
           <div id="interestList" class="interest-list"></div>
         </div>
 
+        <!-- Workspace header disabled -->
+        <div class="sidebar-section workspace-header" id="workspaceHeader" style="display: none;">
+          <button class="workspace-back-btn" id="workspaceBackBtn" type="button">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>All chats</span>
+          </button>
+          <div class="workspace-title-wrapper">
+            <div class="workspace-title" id="workspaceTitle"></div>
+            <div class="workspace-subtitle">Roster workspace</div>
+          </div>
+        </div>
+
         <div class="sidebar-section">
           <div class="sidebar-header">
             <span>CHATS</span>
-            <button class="sidebar-header-action" id="chatsMenuBtn" type="button">…</button>
+            <button class="sidebar-header-action" id="chatsMenuBtn" type="button">⋯</button>
           </div>
+
           <div class="chat-list" id="chatList"></div>
         </div>
       </div>
@@ -72,71 +102,230 @@
       <div class="chat-container">
         <div class="chat-messages" id="chatMessages"></div>
 
+        <!-- Image preview area (shown when images are uploaded) -->
+        <div class="image-preview-container" id="imagePreviewContainer" style="display: none;"></div>
+
         <div class="chat-input-container">
           <form id="chatForm" class="chat-form">
             <div class="input-wrapper">
-              <textarea id="messageInput" class="message-input" placeholder="Ask a question..." rows="1" maxlength="4000"></textarea>
+              <div class="input-plus-wrapper">
+                <button type="button" class="input-plus-button" id="inputPlusButton" aria-label="Add">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </button>
+                <div class="input-plus-menu" id="inputPlusMenu">
+                  <button type="button" class="input-plus-menu-item" id="addFilesButton">
+                    <img src="/static/images/upload_image.png" alt="Add files" class="input-plus-menu-icon">
+                    <span>Add photos & files</span>
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="messageInput"
+                class="message-input"
+                placeholder="Ask anything"
+                rows="1"
+                maxlength="4000"
+              ></textarea>
+
               <button type="submit" class="send-button" id="sendButton" aria-label="Send">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <circle cx="18" cy="18" r="17" fill="currentColor" class="send-button-circle"/>
+                  <path d="M18 12L12 20L18 20L24 20L18 12Z" fill="currentColor" class="send-button-arrow"/>
                 </svg>
               </button>
             </div>
           </form>
         </div>
+
       </div>
     </main>
   </div>
 
-  <!-- SIGNUP MODAL -->
-  <div id="signupModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true">
+  <!-- AUTH MODALS (ONE COPY EACH) -->
+  <div id="signupModal" class="modal-overlay">
+    <div class="modal-content">
       <div class="modal-header">
         <h2>Sign Up</h2>
-        <button class="modal-close" id="signupModalClose" type="button">✕</button>
+        <button class="modal-close" id="signupModalClose" type="button">&times;</button>
       </div>
+
       <form id="signupForm" class="auth-form">
         <div class="form-group">
           <label for="signupEmail">Email</label>
           <input type="email" id="signupEmail" name="email" required>
         </div>
+
         <div class="form-group">
           <label for="signupUsername">Username</label>
           <input type="text" id="signupUsername" name="username" required minlength="3">
         </div>
+
         <div class="form-group">
           <label for="signupPassword">Password</label>
-          <input type="password" id="signupPassword" name="password" required minlength="8">
+          <input type="password" id="signupPassword" name="password" autocomplete="new-password" required minlength="8">
         </div>
+
         <div id="signupError" class="error-message"></div>
         <button type="submit" class="modal-submit-btn">Sign Up</button>
       </form>
     </div>
   </div>
 
-  <!-- LOGIN MODAL -->
-  <div id="loginModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true">
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-content">
       <div class="modal-header">
         <h2>Log In</h2>
-        <button class="modal-close" id="loginModalClose" type="button">✕</button>
+        <button class="modal-close" id="loginModalClose" type="button">&times;</button>
       </div>
+
       <form id="loginForm" class="auth-form">
         <div class="form-group">
-          <label for="loginUsername">Username</label>
+          <label for="loginUsername">Username or Email</label>
           <input type="text" id="loginUsername" name="username" required>
         </div>
+
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" name="password" required>
+          <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
         </div>
+
         <div id="loginError" class="error-message"></div>
         <button type="submit" class="modal-submit-btn">Log In</button>
       </form>
     </div>
   </div>
 
-  <script src="/static/roster_shared.js"></script>
-  <script src="/static/script.js"></script>
+  <!-- UPGRADE MODAL -->
+  <div id="upgradeModal" class="modal-overlay upgrade-modal-overlay">
+    <div class="modal-content upgrade-modal-content">
+      <div class="modal-header">
+        <h2>Choose Your Plan</h2>
+        <button class="modal-close" id="upgradeModalClose" type="button" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="upgrade-modal-body">
+        <div class="upgrade-error-message" id="upgradeErrorMessage" style="display: none;"></div>
+        
+        <div class="plan-cards-container">
+          <!-- BASE Plan Card -->
+          <div class="plan-card" id="planCardBase" data-plan="base">
+            <div class="plan-card-header">
+              <h3 class="plan-name">BASE</h3>
+              <div class="plan-price">
+                <span class="plan-price-amount">Free</span>
+              </div>
+            </div>
+            <div class="plan-card-body">
+              <ul class="plan-features">
+                <li>Limited context</li>
+                <li>No access to premium features</li>
+                <li>5 max chats</li>
+              </ul>
+            </div>
+            <div class="plan-card-footer">
+              <button class="plan-button plan-button-current" id="planButtonBase" type="button" disabled>
+                Current Plan
+              </button>
+            </div>
+          </div>
+
+          <!-- PREMIUM Plan Card -->
+          <div class="plan-card plan-card-premium" id="planCardPremium" data-plan="premium">
+            <div class="plan-card-header">
+              <h3 class="plan-name">PREMIUM</h3>
+              <div class="plan-price">
+                <span class="plan-price-amount">$30</span>
+                <span class="plan-price-period">/ month</span>
+              </div>
+            </div>
+            <div class="plan-card-body">
+              <ul class="plan-features">
+                <li>Unlimited chats</li>
+                <li>No loss of context</li>
+                <li>Access to premium + future features</li>
+              </ul>
+            </div>
+            <div class="plan-card-footer">
+              <button class="plan-button plan-button-primary" id="planButtonPremium" type="button">
+                Upgrade
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPGRADE REQUIRED MODAL -->
+  <div id="upgradeRequiredModal" class="modal-overlay upgrade-required-modal-overlay">
+    <div class="modal-content upgrade-required-modal-content">
+      <div class="modal-header">
+        <h2>Upgrade Required</h2>
+        <button class="modal-close" id="upgradeRequiredModalClose" type="button" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="upgrade-required-modal-body">
+        <p class="upgrade-required-message">Please upgrade plan to access</p>
+        
+        <div class="upgrade-required-actions">
+          <button class="upgrade-required-btn upgrade-required-btn-secondary" id="upgradeRequiredReturnBtn" type="button">
+            Return to Chat
+          </button>
+          <button class="upgrade-required-btn upgrade-required-btn-primary" id="upgradeRequiredUpgradeBtn" type="button">
+            Upgrade
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAN LIMIT MODAL (402 errors) -->
+  <div id="planLimitModal" class="modal-overlay limit-modal-overlay">
+    <div class="modal-content limit-modal-content">
+      <div class="limit-modal-header">
+        <h2 class="limit-modal-title">Plan Limit Reached</h2>
+        <button class="modal-close" id="planLimitModalClose" type="button" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="limit-modal-body">
+        <p class="limit-modal-message" id="planLimitMessage"></p>
+        
+        <div class="limit-modal-actions">
+          <button class="limit-modal-btn limit-modal-btn-secondary" id="planLimitReturnBtn" type="button">
+            Return
+          </button>
+          <button class="limit-modal-btn limit-modal-btn-primary" id="planLimitUpgradeBtn" type="button">
+            Upgrade
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts (ONLY ONCE EACH) -->
+  <script src="/static/api.js?v=1"></script>
+  <script src="/static/auth_client.js?v=1"></script>
+  <script src="/static/app_bootstrap.js?v=1"></script>
+  <script src="/static/auth_shared.js?v=3"></script>
+  <script src="/static/cullen_menu.js?v=1"></script>
+  <script src="/static/sidebar.js?v=3"></script>
+  <script src="/static/shared_state.js?v=1"></script>
+  <script src="/static/script.js?v=4"></script>
+  <script src="/static/roster_store.js?v=2"></script>
+  <script src="/static/roster_shared.js?v=2"></script>
 </body>
 </html>

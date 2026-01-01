@@ -45,6 +45,23 @@ class Token(BaseModel):
     """Schema for JWT token response"""
     access_token: str
     token_type: str = "bearer"
+    refresh_token: Optional[str] = None
+    user: Optional["TokenUser"] = None
+
+
+class TokenUser(BaseModel):
+    """Minimal user info bundled with token responses for frontend convenience."""
+    id: int
+    username: str
+    email: EmailStr
+
+
+Token.model_rebuild()
+
+
+class RefreshTokenRequest(BaseModel):
+    """Schema for refreshing an access token using a refresh token"""
+    refresh_token: str = Field(..., min_length=1)
 
 
 class TokenData(BaseModel):

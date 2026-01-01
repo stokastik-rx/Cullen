@@ -1,162 +1,114 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>C U L L E N . A I</title>
-
+  <!-- Favicon -->
   <link rel="icon" href="/static/favicon/favicon.ico" sizes="any">
   <link rel="icon" href="/static/favicon/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png">
   <link rel="manifest" href="/static/favicon/site.webmanifest">
 
-  <link rel="stylesheet" href="/static/styles.css" />
-  <link rel="stylesheet" href="/static/roster.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>C U L L E N . A I</title>
+
+  <link rel="stylesheet" href="/static/styles.css?v=6" />
 </head>
 
 <body>
   <header class="top-bar">
-    <div class="top-bar-content roster-topbar">
+    <div class="top-bar-content">
       <div class="brand">
         <span class="brand-text">C U L L E N</span>
         <img src="/static/images/red-pill.png" alt="Red Pill Logo" class="pill-logo">
         <span class="brand-text">. A I</span>
+        <span class="brand-text version-number">V 1.0</span>
       </div>
 
       <div class="top-actions">
-        <a class="auth-btn manage-roster-btn" href="/">Return to Chat</a>
+        <!-- Empty placeholder to preserve spacing -->
+        <div style="width: 0; height: 0; visibility: hidden;"></div>
       </div>
 
       <div class="auth-buttons">
         <button class="auth-btn signup-btn" id="signupBtn" type="button">Sign Up</button>
         <button class="auth-btn login-btn" id="loginBtn" type="button">Log In</button>
         <button class="auth-btn upgrade-btn" id="upgradeBtn" type="button">Upgrade</button>
-        <button class="auth-btn" id="logoutBtn" type="button" style="display:none;">Log Out</button>
       </div>
     </div>
   </header>
 
   <div class="app-container">
-    <aside class="sidebar">
-      <div class="sidebar-content">
-        <div class="sidebar-section">
-          <button class="new-chat-button" type="button" onclick="window.location.href='/'">New Chat</button>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-header">
-            <span>ROSTER</span>
-          </div>
-          <div id="interestList" class="interest-list"></div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-header">
-            <span>CHATS</span>
-            <button class="sidebar-header-action" id="chatsMenuBtn" type="button">…</button>
-          </div>
-          <div class="chat-list" id="chatList"></div>
-        </div>
-      </div>
-
-      <div class="sidebar-section user-card-section">
-        <div class="user-card" id="userCard">
-          <div class="user-card-content">
-            <div class="user-name" id="userName">Guest</div>
-            <div class="user-tier tier-base" id="userTier">BASE</div>
-          </div>
-        </div>
-      </div>
-    </aside>
-
     <main class="main-content">
-      <section class="roster-page">
-        <section class="roster-cards" id="rosterCards"></section>
-      </section>
+      <div class="coming-soon-container">
+        <div class="coming-soon-content">
+          <h1 class="coming-soon-title">Coming Soon</h1>
+          <p class="coming-soon-body">
+            Sorry — this function has not been implemented yet. Available in CullenPill 1.5.
+          </p>
+          <a href="/" class="coming-soon-button">Return to Chat</a>
+        </div>
+      </div>
     </main>
   </div>
 
-  <!-- Roster Modal (ONE ONLY) -->
-  <div id="rosterModal" aria-hidden="true">
-    <div class="modal-backdrop" data-close="true"></div>
-
-    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="rosterModalTitle">
-      <div class="modal-panel">
-        <div class="modal-top">
-          <div class="modal-title" id="rosterModalTitle">Create Card</div>
-          <button type="button" class="modal-close" id="rosterModalClose" aria-label="Close">✕</button>
-        </div>
-
-        <form class="modal-form" id="rosterModalForm">
-          <div class="field">
-            <label for="interestNameInput">Name of Interest <span class="req">*</span></label>
-            <input id="interestNameInput" type="text" placeholder="Required" autocomplete="off" required />
-          </div>
-
-          <div class="field">
-            <label for="interestBgInput">Context / Background Information (optional)</label>
-            <textarea id="interestBgInput" rows="4" placeholder="Optional — can be changed later"></textarea>
-          </div>
-
-          <div class="modal-actions">
-            <button type="button" class="modal-btn delete" id="rosterModalDelete" style="display:none;">Delete</button>
-            <button type="button" class="modal-btn cancel" id="rosterModalCancel">Cancel</button>
-            <button type="submit" class="modal-btn save" id="rosterModalSave">Create</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Auth Modals (same as index) -->
-  <div id="signupModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true">
+  <!-- AUTH MODALS (shared with chat page) -->
+  <div id="signupModal" class="modal-overlay">
+    <div class="modal-content">
       <div class="modal-header">
         <h2>Sign Up</h2>
-        <button class="modal-close" id="signupModalClose" type="button">✕</button>
+        <button class="modal-close" id="signupModalClose" type="button">&times;</button>
       </div>
+
       <form id="signupForm" class="auth-form">
         <div class="form-group">
           <label for="signupEmail">Email</label>
           <input type="email" id="signupEmail" name="email" required>
         </div>
+
         <div class="form-group">
           <label for="signupUsername">Username</label>
           <input type="text" id="signupUsername" name="username" required minlength="3">
         </div>
+
         <div class="form-group">
           <label for="signupPassword">Password</label>
-          <input type="password" id="signupPassword" name="password" required minlength="8">
+          <input type="password" id="signupPassword" name="password" autocomplete="new-password" required minlength="8">
         </div>
+
         <div id="signupError" class="error-message"></div>
         <button type="submit" class="modal-submit-btn">Sign Up</button>
       </form>
     </div>
   </div>
 
-  <div id="loginModal" class="modal-overlay" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true">
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-content">
       <div class="modal-header">
         <h2>Log In</h2>
-        <button class="modal-close" id="loginModalClose" type="button">✕</button>
+        <button class="modal-close" id="loginModalClose" type="button">&times;</button>
       </div>
+
       <form id="loginForm" class="auth-form">
         <div class="form-group">
-          <label for="loginUsername">Username</label>
+          <label for="loginUsername">Username or Email</label>
           <input type="text" id="loginUsername" name="username" required>
         </div>
+
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" name="password" required>
+          <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
         </div>
+
         <div id="loginError" class="error-message"></div>
         <button type="submit" class="modal-submit-btn">Log In</button>
       </form>
     </div>
   </div>
 
-  <script src="/static/roster_shared.js"></script>
-  <script src="/static/script.js"></script>
-  <script src="/static/roster.js"></script>
+  <!-- Scripts (load once, after DOM exists) -->
+  <script src="/static/api.js?v=1"></script>
+  <script src="/static/auth_client.js?v=1"></script>
+  <script src="/static/app_bootstrap.js?v=1"></script>
+  <script src="/static/auth_shared.js?v=3"></script>
 </body>
 </html>

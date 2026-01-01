@@ -43,6 +43,7 @@ class UserService:
             username=user_data.username,
             hashed_password=hashed_password,
             subscription_tier="BASE",
+            plan="base",  # Explicitly set plan to base
         )
         db.add(db_user)
         db.commit()

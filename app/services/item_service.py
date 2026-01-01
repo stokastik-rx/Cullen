@@ -2,7 +2,7 @@
 Item service - business logic for items
 """
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.schemas.item import Item, ItemCreate, ItemUpdate
 from app.models.item import ItemModel
@@ -31,7 +31,7 @@ class ItemService:
     
     async def create_item(self, item_create: ItemCreate) -> Item:
         """Create a new item"""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         item = ItemModel(
             id=self._next_id,
             name=item_create.name,
@@ -57,7 +57,7 @@ class ItemService:
         if item_update.price is not None:
             item.price = item_update.price
         
-        item.updated_at = datetime.utcnow()
+        item.updated_at = datetime.now(timezone.utc)
         return self._model_to_schema(item)
     
     async def delete_item(self, item_id: int) -> bool:

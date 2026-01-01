@@ -1,7 +1,7 @@
 """
 Item data model
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 
@@ -21,6 +21,6 @@ class ItemModel:
         self.name = name
         self.description = description
         self.price = price
-        self.created_at = created_at or datetime.utcnow()
-        self.updated_at = updated_at or datetime.utcnow()
+        self.created_at = created_at or datetime.now(timezone.utc)
+        self.updated_at = updated_at or datetime.now(timezone.utc)
 
