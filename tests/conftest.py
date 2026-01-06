@@ -2,6 +2,7 @@
 Pytest configuration and fixtures
 """
 import pytest
+import os
 from fastapi.testclient import TestClient
 import httpx
 from sqlalchemy import create_engine
@@ -17,14 +18,17 @@ from app.models.roster import RosterState  # noqa: F401
 
 from app.main import app
 
-# Use in-memory SQLite for testing with StaticPool to share connection across threads
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+# Default to in-memory SQLite for tests. Set TEST_DATABASE_URL to point to Postgres if desired.
+SQLALCHEMY_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///:memory:")
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,  # Use static pool for in-memory SQLite
-)
+engine_kwargs = {}
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    engine_kwargs = {
+        "connect_args": {"check_same_thread": False},
+        "poolclass": StaticPool,  # Use static pool for in-memory SQLite
+    }
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

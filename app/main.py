@@ -2,6 +2,7 @@
 Main FastAPI application entry point
 """
 import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,7 +31,10 @@ setup_logging()
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events"""
     # Startup - initialize database tables
-    init_db()
+    is_pytest = ("pytest" in sys.modules) or (os.getenv("PYTEST_CURRENT_TEST") is not None)
+    if (os.getenv("SKIP_DB_INIT") != "1") and (not is_pytest):
+        # Initialize DB schema (skipped during pytest or when SKIP_DB_INIT=1)
+        init_db()
     ensure_upload_dirs()
     yield
     # Shutdown
@@ -63,7 +67,6 @@ setup_exception_handlers(app)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 ensure_upload_dirs()
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-from fastapi.responses import FileResponse
 
 @app.get("/roster")
 def roster_page():
@@ -90,10 +93,6 @@ def roster_page():
 """
     return HTMLResponse(content=html, status_code=403)
 
-@app.get("/")
-def chat_page():
-    return FileResponse("static/index.html")
-
 # Include routers
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.include_router(conversations_router, prefix="/api")
@@ -103,17 +102,28 @@ app.include_router(roster_router, prefix="/api")
 app.include_router(uploads_router, prefix="/api")
 
 
-@app.get("/", tags=["Root"])
-async def root():
-    """Root endpoint - serves the chat interface"""
-    index_path = os.path.join("static", "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {
-        "message": f"Welcome to {settings.PROJECT_NAME}",
-        "version": settings.VERSION,
-        "docs": "/docs",
-    }
+@app.get("/", include_in_schema=False)
+def home():
+    """
+    Serve the chat UI.
+
+    Preferred: static/pages/index.html (new structure)
+    Fallback: static/index.html (legacy)
+    """
+    preferred = os.path.join("static", "pages", "index.html")
+    if os.path.exists(preferred):
+        return FileResponse(preferred)
+    legacy = os.path.join("static", "index.html")
+    if os.path.exists(legacy):
+        return FileResponse(legacy)
+    return JSONResponse(
+        status_code=200,
+        content={
+            "message": f"Welcome to {settings.PROJECT_NAME}",
+            "version": settings.VERSION,
+            "docs": "/docs",
+        },
+    )
 
 
 @app.get("/health", tags=["Health"])

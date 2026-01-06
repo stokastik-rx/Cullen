@@ -34,6 +34,7 @@ from app.schemas.chat import (
     ThreadMessageCreate,
 )
 from app.services.chat_service import ChatService
+from app.services.llm_service import generate_assistant_reply
 
 # Backwards-compatible router mounted at /api/v1/chat
 router = APIRouter()
@@ -197,8 +198,12 @@ async def send_message(
     else:
         thread, _ = service.create_thread_with_first_user_message(current_user.id, request.message, db)
 
-    # LLM response generation (external Grok bridge)
-    response_text = await _call_grok(request.message)
+    response_text = await generate_assistant_reply(
+        thread_id=thread.id,
+        user_id=current_user.id,
+        user_message=request.message,
+        db=db,
+    )
     # If the user message was allowed as the 30th, the assistant message may exceed limits; ignore.
     try:
         service.add_message(thread.id, current_user.id, ThreadMessageCreate(role="assistant", content=response_text), db)
@@ -379,8 +384,12 @@ async def chat_send(
         # Add user message
         service.add_message(thread_id, current_user.id, ThreadMessageCreate(role="user", content=request.message), db)
     
-    # Add assistant response (may also hit limit, but handle gracefully)
-    assistant_content = await _call_grok(request.message)
+    assistant_content = await generate_assistant_reply(
+        thread_id=thread_id,
+        user_id=current_user.id,
+        user_message=request.message,
+        db=db,
+    )
     try:
         service.add_message(
             thread_id, current_user.id, ThreadMessageCreate(role="assistant", content=assistant_content), db

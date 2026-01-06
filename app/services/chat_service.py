@@ -125,23 +125,26 @@ class ChatService:
         Atomically create a thread and insert its first USER message.
         Title is derived from that first user message.
         """
-        # Enforce plan limits server-side (BASE max chats) before opening transaction
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            raise ValueError("User not found")
-
-        plan = self._effective_plan(user)
-        limits = get_limits_for_plan(plan)
-        if limits.max_threads is not None:
-            count = db.query(ChatThread).filter(ChatThread.user_id == user_id).count()
-            if count >= limits.max_threads:
-                raise_plan_limit(
-                    "PLAN_MAX_CHATS",
-                    "Base plan allows only 5 chats. Upgrade for unlimited.",
-                    {"max_chats": limits.max_threads},
-                )
-
+        # Important: do not issue queries on the Session before starting the transaction.
+        # SQLAlchemy 2.x will "autobegin" a transaction on first use; calling db.begin()
+        # afterwards will raise: "A transaction is already begun on this Session."
         with db.begin():
+            # Enforce plan limits server-side (BASE max chats)
+            user = db.query(User).filter(User.id == user_id).first()
+            if not user:
+                raise ValueError("User not found")
+
+            plan = self._effective_plan(user)
+            limits = get_limits_for_plan(plan)
+            if limits.max_threads is not None:
+                count = db.query(ChatThread).filter(ChatThread.user_id == user_id).count()
+                if count >= limits.max_threads:
+                    raise_plan_limit(
+                        "PLAN_MAX_CHATS",
+                        "Base plan allows only 5 chats. Upgrade for unlimited.",
+                        {"max_chats": limits.max_threads},
+                    )
+
             thread = ChatThread(user_id=user_id, title=None)
             db.add(thread)
             db.flush()  # get thread.id

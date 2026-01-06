@@ -1,17 +1,70 @@
 """
 Database connection and session management
 """
+import logging
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.exc import OperationalError
+from sqlalchemy import text
+from sqlalchemy.engine import Engine
 
 from app.core.config import settings
 
-# Create SQLAlchemy engine
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {},
-    echo=settings.DEBUG,
-)
+# Helpers
+DATABASE_URL = settings.DATABASE_URL
+
+logger = logging.getLogger(__name__)
+
+
+def _is_sqlite_url(url: str) -> bool:
+    return url.strip().lower().startswith("sqlite")
+
+
+def _build_engine(url: str) -> Engine:
+    connect_args = {"check_same_thread": False} if _is_sqlite_url(url) else {}
+    return create_engine(
+        url,
+        connect_args=connect_args,
+        echo=settings.DEBUG,
+        pool_pre_ping=True,
+    )
+
+
+def _select_engine() -> tuple[Engine, str]:
+    """
+    Prefer configured DATABASE_URL, but fall back to local SQLite for dev if Postgres isn't reachable.
+
+    This prevents "Internal Server Error" / startup crashes when Postgres isn't running locally.
+    Set REQUIRE_DATABASE=1 to fail hard instead of falling back.
+    """
+    url = DATABASE_URL
+    engine_local = _build_engine(url)
+
+    try:
+        with engine_local.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return engine_local, url
+    except OperationalError as e:
+        if os.getenv("REQUIRE_DATABASE") == "1":
+            raise
+
+        if url.strip().lower().startswith("postgres"):
+            fallback_url = "sqlite:///./app.db"
+            logger.warning(
+                "Database connection failed for DATABASE_URL=%s. Falling back to SQLite (%s). Error=%s",
+                url,
+                fallback_url,
+                e.__class__.__name__,
+            )
+            return _build_engine(fallback_url), fallback_url
+
+        raise
+
+
+# Create SQLAlchemy engine (with dev-friendly fallback)
+engine, EFFECTIVE_DATABASE_URL = _select_engine()
 
 # Create SessionLocal class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -43,13 +96,14 @@ def init_db():
     from sqlalchemy import inspect, text
     inspector = inspect(engine)
     table_names = inspector.get_table_names()
+    dialect = engine.dialect.name
+    is_postgres = dialect == "postgresql"
+    plan_renews_at_sql_type = "TIMESTAMPTZ" if is_postgres else "TIMESTAMP"
     
     if 'users' in table_names:
         columns = [col['name'] for col in inspector.get_columns('users')]
         if 'subscription_tier' not in columns:
             with engine.connect() as conn:
-                # SQLite: Add column as nullable first, then update values, then we can't add NOT NULL constraint
-                # So we'll add it with DEFAULT and handle NULLs in application code
                 try:
                     conn.execute(text("ALTER TABLE users ADD COLUMN subscription_tier VARCHAR(20) DEFAULT 'BASE'"))
                     conn.commit()
@@ -63,7 +117,7 @@ def init_db():
                     logger.warning(f"Migration warning: {e}")
                     conn.rollback()
 
-        # Migration: Add billing/plan columns (additive, SQLite-friendly)
+        # Migration: Add billing/plan columns (additive)
         with engine.connect() as conn:
             try:
                 if "plan" not in columns:
@@ -81,7 +135,7 @@ def init_db():
                     conn.execute(text("ALTER TABLE users ADD COLUMN plan_status VARCHAR(20)"))
                     conn.commit()
                 if "plan_renews_at" not in columns:
-                    conn.execute(text("ALTER TABLE users ADD COLUMN plan_renews_at DATETIME"))
+                    conn.execute(text(f"ALTER TABLE users ADD COLUMN plan_renews_at {plan_renews_at_sql_type}"))
                     conn.commit()
 
                 # Best-effort indexes
@@ -96,7 +150,7 @@ def init_db():
                 logger.warning(f"Migration warning (users billing fields): {e}")
                 conn.rollback()
 
-    # Migration: Add roster_card_id to chat_threads if it doesn't exist (SQLite-friendly).
+    # Migration: Add roster_card_id to chat_threads if it doesn't exist.
     if "chat_threads" in table_names:
         columns = [col["name"] for col in inspector.get_columns("chat_threads")]
         if "roster_card_id" not in columns:
@@ -118,7 +172,7 @@ def init_db():
             except Exception:
                 conn.rollback()
 
-    # Migration: Add image attachment columns to chat_messages (SQLite-friendly).
+    # Migration: Add image attachment columns to chat_messages.
     if "chat_messages" in table_names:
         msg_cols = [col["name"] for col in inspector.get_columns("chat_messages")]
         with engine.connect() as conn:

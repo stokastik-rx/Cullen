@@ -4,7 +4,8 @@ Roster endpoints (per-account roster cards)
 
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -15,7 +16,7 @@ from app.services.roster_service import RosterService
 
 router = APIRouter()
 
-_ROSTER_DISABLED_DETAIL = "Roster is not available until CullenPill 1.5"
+logger = logging.getLogger(__name__)
 
 
 @router.get("/cards", response_model=List[RosterCard], status_code=status.HTTP_200_OK)
@@ -26,7 +27,11 @@ async def get_roster_cards(
     """
     Get roster cards for the current user (requires JWT).
     """
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=_ROSTER_DISABLED_DETAIL)
+    # Roster feature is not released yet, but the frontend still calls this endpoint
+    # during auth/bootstrap flows. Return a safe empty list instead of 403 to avoid
+    # breaking signup/login UX.
+    _ = (current_user, db)  # keep deps in place (auth-required)
+    return []
 
 
 @router.put("/cards", response_model=List[RosterCard], status_code=status.HTTP_200_OK)
@@ -40,6 +45,10 @@ async def put_roster_cards(
 
     The frontend can treat this like "save roster" and just PUT the whole list.
     """
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=_ROSTER_DISABLED_DETAIL)
+    # No-op persistence until roster is released.
+    # Return the payload so the client can continue operating without errors.
+    logger.info("Roster PUT ignored (feature disabled) user_id=%s cards=%s", current_user.id, len(cards))
+    _ = db
+    return cards
 
 
