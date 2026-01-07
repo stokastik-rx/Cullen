@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hmac
 import hashlib
+import logging
 import time
 from typing import Any, Dict, Optional, Tuple
 
@@ -16,15 +17,72 @@ import httpx
 
 from app.core.config import settings
 
+logger = logging.getLogger(__name__)
+
 
 class StripeConfigError(RuntimeError):
     pass
+
+
+class StripeAPIError(RuntimeError):
+    """
+    Raised when Stripe returns a non-2xx response.
+
+    Contains a safe, user-displayable message (no secrets).
+    """
+
+    def __init__(
+        self,
+        *,
+        status_code: int,
+        message: str,
+        stripe_type: str | None = None,
+        stripe_code: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.message = message
+        self.stripe_type = stripe_type
+        self.stripe_code = stripe_code
 
 
 def _require_stripe_secret_key() -> str:
     if not settings.STRIPE_SECRET_KEY:
         raise StripeConfigError("STRIPE_SECRET_KEY is not configured")
     return settings.STRIPE_SECRET_KEY
+
+
+def _raise_stripe_api_error(resp: httpx.Response) -> None:
+    status_code = resp.status_code
+    message = "Stripe request failed"
+    stripe_type: str | None = None
+    stripe_code: str | None = None
+    try:
+        data = resp.json()
+        if isinstance(data, dict) and isinstance(data.get("error"), dict):
+            err = data["error"]
+            message = err.get("message") or message
+            stripe_type = err.get("type")
+            stripe_code = err.get("code")
+        else:
+            # fallback: keep short text
+            message = (resp.text or message)[:300]
+    except Exception:
+        message = (resp.text or message)[:300]
+
+    logger.warning(
+        "Stripe API error status=%s type=%s code=%s msg=%s",
+        status_code,
+        stripe_type,
+        stripe_code,
+        message,
+    )
+    raise StripeAPIError(
+        status_code=status_code,
+        message=message,
+        stripe_type=stripe_type,
+        stripe_code=stripe_code,
+    )
 
 
 def stripe_post_form(path: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -39,7 +97,10 @@ def stripe_post_form(path: str, data: Dict[str, Any]) -> Dict[str, Any]:
     }
     with httpx.Client(timeout=20) as client:
         resp = client.post(url, data=data, headers=headers)
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except httpx.HTTPStatusError:
+            _raise_stripe_api_error(resp)
         return resp.json()
 
 
@@ -51,7 +112,10 @@ def stripe_get(path: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, 
     }
     with httpx.Client(timeout=20) as client:
         resp = client.get(url, params=params, headers=headers)
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except httpx.HTTPStatusError:
+            _raise_stripe_api_error(resp)
         return resp.json()
 
 

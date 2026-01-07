@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.dependencies import get_current_active_user
-from app.core.stripe import StripeConfigError, verify_stripe_signature
+from app.core.stripe import StripeAPIError, StripeConfigError, verify_stripe_signature
 from app.models.user import User
 from app.schemas.billing import (
     BillingFeatures,
@@ -42,6 +42,9 @@ async def create_checkout_session(
         url = service.create_checkout_session(current_user, db)
     except StripeConfigError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    except StripeAPIError as e:
+        msg = f"Stripe API error ({e.status_code}): {e.message}"
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=msg)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Stripe error: {type(e).__name__}")
     return CheckoutSessionResponse(url=url)
@@ -64,6 +67,9 @@ async def create_portal_session(
         url = service.create_billing_portal_session(current_user, db)
     except StripeConfigError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    except StripeAPIError as e:
+        msg = f"Stripe API error ({e.status_code}): {e.message}"
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=msg)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Stripe error: {type(e).__name__}")
     return PortalSessionResponse(url=url)
