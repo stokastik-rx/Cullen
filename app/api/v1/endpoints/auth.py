@@ -153,6 +153,8 @@ async def login(
     # Create tokens with username as subject
     access_token = create_access_token(data={"sub": user.username})
     refresh_token = create_refresh_token(data={"sub": user.username})
+    
+    # Set cookies if response object is available
     if response is not None:
         _set_auth_cookies(response, access_token=access_token, refresh_token=refresh_token)
 
@@ -177,6 +179,7 @@ async def get_current_user_profile(
     return UserProfile(
         username=current_user.username,
         subscription_tier=current_user.subscription_tier,
+        is_admin=getattr(current_user, "is_admin", False),
     )
 
 
@@ -190,6 +193,7 @@ class AuthMeStatus(BaseModel):
     user_id: int | None = None
     email: str | None = None
     subscription_tier: str | None = None
+    is_admin: bool | None = None
 
 
 @router.get("/me_status", response_model=AuthMeStatus, status_code=status.HTTP_200_OK)
@@ -228,6 +232,7 @@ async def me_status(request: Request, db: Session = Depends(get_db)):
         user_id=user.id,
         email=user.email,
         subscription_tier=getattr(user, "subscription_tier", None),
+        is_admin=getattr(user, "is_admin", None),
     )
 
 

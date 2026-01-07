@@ -13,7 +13,13 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_active_user
 from app.core.stripe import StripeConfigError, verify_stripe_signature
 from app.models.user import User
-from app.schemas.billing import BillingFeatures, BillingMeResponse, CheckoutSessionResponse, StripeWebhookAck
+from app.schemas.billing import (
+    BillingFeatures,
+    BillingMeResponse,
+    CheckoutSessionResponse,
+    PortalSessionResponse,
+    StripeWebhookAck,
+)
 from app.services.billing_service import BillingService
 
 router = APIRouter()
@@ -39,6 +45,28 @@ async def create_checkout_session(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Stripe error: {type(e).__name__}")
     return CheckoutSessionResponse(url=url)
+
+
+@router.post(
+    "/create-portal-session",
+    response_model=PortalSessionResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def create_portal_session(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Create a Stripe Customer Portal session so the user can manage/cancel their subscription.
+    """
+    service = BillingService()
+    try:
+        url = service.create_billing_portal_session(current_user, db)
+    except StripeConfigError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Stripe error: {type(e).__name__}")
+    return PortalSessionResponse(url=url)
 
 
 @router.post("/webhook", response_model=StripeWebhookAck, status_code=status.HTTP_200_OK)
@@ -75,6 +103,15 @@ async def billing_me(current_user: User = Depends(get_current_active_user)):
     """
     Return current plan + feature flags.
     """
+    # Admin accounts get premium feature flags (for testing).
+    if getattr(current_user, "is_admin", False):
+        return BillingMeResponse(
+            plan="premium",
+            status="active",
+            renews_at=None,
+            features=BillingFeatures(max_chats=None, context_limit=None, premium_features=True),
+        )
+
     plan = (getattr(current_user, "plan", None) or "base").lower()
     status_val = getattr(current_user, "plan_status", None)
     renews_at = getattr(current_user, "plan_renews_at", None)

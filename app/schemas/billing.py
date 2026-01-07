@@ -14,6 +14,10 @@ class CheckoutSessionResponse(BaseModel):
     url: str
 
 
+class PortalSessionResponse(BaseModel):
+    url: str
+
+
 class BillingFeatures(BaseModel):
     max_chats: Optional[int] = Field(None, description="Maximum chats allowed (None = unlimited)")
     context_limit: Optional[int] = Field(None, description="Max messages used as model context (None = full)")

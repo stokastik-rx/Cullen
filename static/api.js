@@ -124,6 +124,15 @@
       ...options.headers,
     };
 
+    // If caller is sending a JSON string body and didn't specify Content-Type,
+    // default to application/json. This prevents FastAPI from treating the body
+    // as raw bytes and raising a validation error.
+    const hasContentType =
+      Object.keys(headers).some((k) => k.toLowerCase() === 'content-type');
+    if (!hasContentType && typeof options.body === 'string') {
+      headers['Content-Type'] = 'application/json';
+    }
+
     const response = await fetch(url, {
       ...options,
       headers,

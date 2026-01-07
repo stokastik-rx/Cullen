@@ -2,12 +2,32 @@
 Custom exception handlers
 """
 import logging
+from typing import Any
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 logger = logging.getLogger(__name__)
+
+def _jsonable(value: Any) -> Any:
+    """
+    Convert a value into something JSON serializable.
+
+    FastAPI/Pydantic validation errors can include raw `bytes` (e.g. when a client
+    omits Content-Type and FastAPI treats the body as bytes). JSONResponse will
+    crash on bytes unless we sanitize.
+    """
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(v) for v in value]
+    if isinstance(value, set):
+        return [_jsonable(v) for v in value]
+    return value
 
 
 class AppException(Exception):
@@ -90,11 +110,12 @@ def setup_exception_handlers(app: FastAPI):
     
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
+        safe_errors = _jsonable(exc.errors())
         logger.info(
             "ValidationError %s %s -> 422: %s",
             request.method,
             request.url.path,
-            exc.errors(),
+            safe_errors,
         )
         return JSONResponse(
             # Starlette/FastAPI deprecate *_ENTITY in favor of *_CONTENT
@@ -102,7 +123,7 @@ def setup_exception_handlers(app: FastAPI):
             content={
                 "error": True,
                 "message": "Validation error",
-                "details": exc.errors(),
+                "details": safe_errors,
                 "status_code": 422,
             },
         )
@@ -111,11 +132,16 @@ def setup_exception_handlers(app: FastAPI):
     async def general_exception_handler(request: Request, exc: Exception):
         # Critical: log stacktrace so we can debug real production issues.
         logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
+        msg = "Internal server error"
+        lower = str(exc).lower()
+        # Common dev-time failure: DB schema is behind the models (missing columns).
+        if isinstance(exc, (OperationalError, ProgrammingError)) and ("no such column" in lower or "has no column" in lower):
+            msg = "Database schema error. Please restart the server to apply the latest non-destructive migrations."
         return JSONResponse(
             status_code=500,
             content={
                 "error": True,
-                "message": "Internal server error",
+                "message": msg,
                 "status_code": 500,
             },
         )

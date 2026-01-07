@@ -45,6 +45,25 @@
   }
 
   /**
+   * Toggle Admin Panel button (bottom-right).
+   */
+  function updateAdminButton(isAdmin) {
+    const btn = document.getElementById('adminPanelBtn');
+    if (!btn) return;
+    btn.style.display = isAdmin ? 'inline-flex' : 'none';
+  }
+
+  function bindAdminButton() {
+    const btn = document.getElementById('adminPanelBtn');
+    if (!btn) return;
+    if (btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      window.location.href = '/admin';
+    });
+  }
+
+  /**
    * Initialize auth state on page load
    */
   async function initAuth() {
@@ -65,6 +84,7 @@
           // Fetch user profile
           const profile = await window.AuthClient.getMe();
           updateUserCard(profile.username, profile.subscription_tier);
+          updateAdminButton(!!profile.is_admin);
         } catch (error) {
           console.error('[AppBootstrap] Error loading user profile:', error);
           // If token is invalid, clear it
@@ -73,10 +93,14 @@
             updateAuthButtons();
           }
           updateUserCard('Guest', 'BASE');
+          updateAdminButton(false);
         }
       } else {
         updateUserCard('Guest', 'BASE');
+        updateAdminButton(false);
       }
+
+      bindAdminButton();
 
       // Emit ready event
       window.dispatchEvent(new CustomEvent('auth:ready', {
@@ -85,6 +109,7 @@
     } catch (error) {
       console.error('[AppBootstrap] Error initializing auth:', error);
       updateUserCard('Guest', 'BASE');
+      updateAdminButton(false);
       window.dispatchEvent(new CustomEvent('auth:ready', {
         detail: { loggedIn: false }
       }));
@@ -105,14 +130,17 @@
       window.AuthClient.getMe()
         .then(profile => {
           updateUserCard(profile.username, profile.subscription_tier);
+          updateAdminButton(!!profile.is_admin);
         })
         .catch(error => {
           console.error('[AppBootstrap] Error loading profile after auth change:', error);
           updateUserCard('Guest', 'BASE');
+          updateAdminButton(false);
         });
     } else {
       // Clear user card
       updateUserCard('Guest', 'BASE');
+      updateAdminButton(false);
     }
   }
 

@@ -102,13 +102,22 @@
 
     // Use centralized API client if available
     if (typeof window.API !== 'undefined' && window.API.public) {
-      const data = await window.API.public('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData,
-      });
-      setToken(data.access_token, data.token_type);
-      return data;
+      try {
+        const data = await window.API.public('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formData,
+        });
+        if (data && data.access_token) {
+          setToken(data.access_token, data.token_type || 'bearer');
+          return data;
+        } else {
+          throw new Error('Invalid login response: missing access_token');
+        }
+      } catch (error) {
+        console.error('[AuthClient] Login error:', error);
+        throw error;
+      }
     }
 
     // Fallback to direct fetch
@@ -120,12 +129,18 @@
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || 'Login failed');
+      const errorMsg = errorData.detail || errorData.message || 'Login failed';
+      console.error('[AuthClient] Login failed:', response.status, errorMsg);
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();
-    setToken(data.access_token, data.token_type);
-    return data;
+    if (data && data.access_token) {
+      setToken(data.access_token, data.token_type || 'bearer');
+      return data;
+    } else {
+      throw new Error('Invalid login response: missing access_token');
+    }
   }
 
   /**

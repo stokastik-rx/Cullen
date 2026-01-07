@@ -92,6 +92,18 @@ Copy `env.example` to `.env` and customize settings if needed:
 cp env.example .env
 ```
 
+## Database (PostgreSQL)
+
+1. Start Postgres:
+```bash
+docker compose up -d
+```
+
+2. Copy `env.example` to `.env` and keep/set:
+```bash
+DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/cullen
+```
+
 ## Chat Interface
 
 The application includes a beautiful ChatGPT-like web interface accessible at the root URL (`http://localhost:8000`). Features include:
@@ -130,12 +142,7 @@ The application includes a beautiful ChatGPT-like web interface accessible at th
 
 ### Adding Database Support
 
-The current implementation uses in-memory storage. To add database support:
-
-1. Install a database driver (e.g., `sqlalchemy`, `asyncpg` for PostgreSQL)
-2. Create database models in `app/models/` using SQLAlchemy
-3. Update services to use database sessions
-4. Add database initialization in `app/main.py` lifespan
+The app uses SQLAlchemy models in `app/models/` and reads the connection string from `DATABASE_URL`.
 
 ### Adding Authentication
 

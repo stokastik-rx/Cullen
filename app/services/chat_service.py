@@ -35,6 +35,10 @@ class ChatService:
 
         Everything else is treated as base to avoid accidental unlimited access.
         """
+        # Admin accounts get premium for free (for testing + internal moderation tools).
+        if getattr(user, "is_admin", False):
+            return "premium"
+
         plan = (getattr(user, "plan", None) or "base").strip().lower()
         status = (getattr(user, "plan_status", None) or "").strip().lower()
 

@@ -3,7 +3,7 @@ User data model
 """
 from datetime import datetime
 from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import String, DateTime
+from sqlalchemy import String, DateTime, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -27,6 +27,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     subscription_tier: Mapped[str] = mapped_column(String(20), default="BASE", nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
 
     # Billing / plan fields (additive, migration-safe)
     # plan: "base" | "premium"

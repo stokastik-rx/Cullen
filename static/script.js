@@ -44,12 +44,30 @@ function extractErrorMessage(errorData) {
 
 // Upgrade Modal Functionality
 let currentPlan = 'base'; // Default to base
+let isAdminUser = false;
+
+async function refreshAdminFlag() {
+    try {
+        const profile = await Auth.getUserProfile();
+        isAdminUser = !!(profile && profile.is_admin);
+        return isAdminUser;
+    } catch (e) {
+        isAdminUser = false;
+        return false;
+    }
+}
 
 async function fetchCurrentPlan() {
     try {
         const token = Auth.getAuthToken();
         if (!token) {
             return null; // No token = not authenticated
+        }
+
+        // Admin accounts get premium for free (testing/moderation). Treat as premium in UI.
+        await refreshAdminFlag();
+        if (isAdminUser) {
+            return 'premium';
         }
         
         const response = await fetch('/api/v1/billing/me', {
@@ -89,6 +107,7 @@ async function fetchCurrentPlan() {
 
 function updatePlanUI(plan) {
     currentPlan = plan || 'base';
+    const manageBillingBtn = document.getElementById('manageBillingBtn');
     
     // Remove active class from all cards
     document.querySelectorAll('.plan-card').forEach(card => {
@@ -101,6 +120,7 @@ function updatePlanUI(plan) {
     
     if (currentPlan === 'base') {
         document.getElementById('planCardBase')?.classList.add('active');
+        if (manageBillingBtn) manageBillingBtn.style.display = 'none';
         if (baseButton) {
             baseButton.textContent = 'Current Plan';
             baseButton.disabled = true;
@@ -111,6 +131,8 @@ function updatePlanUI(plan) {
         }
     } else if (currentPlan === 'premium') {
         document.getElementById('planCardPremium')?.classList.add('active');
+        // Only show billing portal button for paid premium users, not admin-free premium.
+        if (manageBillingBtn) manageBillingBtn.style.display = isAdminUser ? 'none' : 'block';
         if (baseButton) {
             baseButton.textContent = 'Downgrade';
             baseButton.disabled = true; // Disabled for now
@@ -230,6 +252,22 @@ async function handleUpgrade() {
     }
     
     try {
+        // Admin accounts should not purchase — they already have premium for free.
+        await refreshAdminFlag();
+        if (isAdminUser) {
+            updatePlanUI('premium');
+            const errorMessage = document.getElementById('upgradeErrorMessage');
+            if (errorMessage) {
+                errorMessage.textContent = 'Admin accounts already have Premium (free) for testing.';
+                errorMessage.style.display = 'block';
+            }
+            if (premiumButton) {
+                premiumButton.disabled = true;
+                premiumButton.textContent = 'Current Plan';
+            }
+            return;
+        }
+
         const token = Auth.getAuthToken();
         const response = await fetch('/api/v1/billing/create-checkout-session', {
             method: 'POST',
@@ -254,7 +292,12 @@ async function handleUpgrade() {
         
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.detail || errorData.message || 'Failed to create checkout session');
+            const detail = errorData.detail || errorData.message;
+            // Friendlier message for common misconfig.
+            if (typeof detail === 'string' && detail.includes('STRIPE_PRICE_ID_PREMIUM')) {
+                throw new Error('Payments are not configured yet. Please set STRIPE_PRICE_ID_PREMIUM on the server and restart.');
+            }
+            throw new Error(detail || 'Failed to create checkout session');
 }
         
         const data = await response.json();
@@ -279,11 +322,63 @@ async function handleUpgrade() {
     }
 }
 
+async function handleManageBilling() {
+    if (!Auth.isLoggedIn()) {
+        const errorMessage = document.getElementById('upgradeErrorMessage');
+        if (errorMessage) {
+            errorMessage.textContent = 'Please log in to manage billing';
+            errorMessage.style.display = 'block';
+        }
+        return;
+    }
+
+    const manageBtn = document.getElementById('manageBillingBtn');
+    if (manageBtn) {
+        manageBtn.disabled = true;
+        manageBtn.textContent = 'Opening...';
+    }
+
+    try {
+        const token = Auth.getAuthToken();
+        const response = await fetch('/api/v1/billing/create-portal-session', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || errorData.message || 'Failed to create billing portal session');
+        }
+        const data = await response.json();
+        if (data.url) {
+            window.location.href = data.url;
+            return;
+        }
+        throw new Error('No portal URL received');
+    } catch (error) {
+        console.error('[BillingPortal] Error:', error);
+        const errorMessage = document.getElementById('upgradeErrorMessage');
+        if (errorMessage) {
+            errorMessage.textContent = error.message || 'Failed to open billing portal. Please try again.';
+            errorMessage.style.display = 'block';
+        }
+    } finally {
+        if (manageBtn) {
+            manageBtn.disabled = false;
+            manageBtn.textContent = 'Manage Billing';
+        }
+    }
+}
+
 // Initialize upgrade modal handlers
 (function initUpgradeModal() {
     const upgradeBtn = document.getElementById('upgradeBtn');
     const upgradeModalClose = document.getElementById('upgradeModalClose');
     const planButtonPremium = document.getElementById('planButtonPremium');
+    const manageBillingBtn = document.getElementById('manageBillingBtn');
     
     if (upgradeBtn) {
         upgradeBtn.addEventListener('click', () => {
@@ -322,6 +417,12 @@ async function handleUpgrade() {
             handleUpgrade();
         });
     }
+
+    if (manageBillingBtn) {
+        manageBillingBtn.addEventListener('click', () => {
+            handleManageBilling();
+        });
+    }
 })();
 
 // DOM Elements
@@ -334,6 +435,24 @@ const sendButton = document.getElementById('sendButton');
 // Initialize
 (async () => {
     await checkAuthState();
+    // If Stripe redirected back with a billing status, refresh plan state and clean the URL.
+    try {
+        const params = new URLSearchParams(window.location.search || '');
+        const billing = params.get('billing');
+        if (billing === 'success' || billing === 'cancel') {
+            // Refresh plan so the modal/UI reflect latest status after webhook processing.
+            const plan = await fetchCurrentPlan();
+            updatePlanUI(plan || 'base');
+
+            // Remove the query param so refresh doesn't repeat behavior.
+            params.delete('billing');
+            const newQuery = params.toString();
+            const newUrl = window.location.pathname + (newQuery ? `?${newQuery}` : '') + window.location.hash;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    } catch (e) {
+        console.warn('[Billing] return param handling failed:', e);
+    }
     // Welcome message is already shown by clearMessages() in checkAuthState()
     // No need to call it again here
 })();

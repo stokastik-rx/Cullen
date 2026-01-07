@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — CULLEN.AI</title>
+  <link rel="stylesheet" href="/static/styles.css?v=7">
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-content">
+      <div class="brand">
+        <span class="brand-text">ADMIN</span>
+        <span class="brand-text version-number">PANEL</span>
+      </div>
+      <div class="auth-buttons">
+        <a class="auth-btn" href="/" style="text-decoration:none;">Back</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container" style="padding: 18px; justify-content: center;">
+    <div class="card" style="max-width: 1100px; width: 100%; padding: 18px; border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; background: rgba(255,255,255,0.03);">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap: 12px; margin-bottom: 12px;">
+        <div style="font-weight: 900; letter-spacing: 0.10em; text-transform: uppercase;">Users</div>
+        <div id="adminStatus" style="color: rgba(255,255,255,0.7); font-size: 13px;"></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div style="min-height: 360px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px;">
+          <div style="display:flex; gap: 10px; margin-bottom: 10px;">
+            <input id="userSearch" placeholder="Search by email/username" style="flex:1; background:#000; border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:10px 12px; color:#fff;">
+            <button id="refreshUsers" class="auth-btn" type="button">Refresh</button>
+          </div>
+          <div style="overflow:auto; max-height: 520px;">
+            <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+              <thead>
+                <tr style="text-align:left; color: rgba(255,255,255,0.7);">
+                  <th style="padding: 8px 6px;">ID</th>
+                  <th style="padding: 8px 6px;">Username</th>
+                  <th style="padding: 8px 6px;">Email</th>
+                  <th style="padding: 8px 6px;">Admin</th>
+                </tr>
+              </thead>
+              <tbody id="usersTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="min-height: 360px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <div style="font-weight: 800;">Threads</div>
+            <div id="selectedUser" style="color: rgba(255,255,255,0.7); font-size: 13px;"></div>
+          </div>
+          <div style="overflow:auto; max-height: 520px;">
+            <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+              <thead>
+                <tr style="text-align:left; color: rgba(255,255,255,0.7);">
+                  <th style="padding: 8px 6px;">Thread</th>
+                  <th style="padding: 8px 6px;">Title</th>
+                  <th style="padding: 8px 6px;">Msgs</th>
+                </tr>
+              </thead>
+              <tbody id="threadsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+          <div style="font-weight: 800;">Messages</div>
+          <div id="selectedThread" style="color: rgba(255,255,255,0.7); font-size: 13px;"></div>
+        </div>
+        <div id="messagesBox" style="max-height: 420px; overflow:auto; padding-right: 6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/api.js?v=2"></script>
+  <script src="/static/auth_client.js?v=1"></script>
+  <script src="/static/admin_panel.js?v=1"></script>
+</body>
+</html>
+
+

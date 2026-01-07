@@ -74,6 +74,21 @@ class BillingService:
         )
         return session["url"]
 
+    def create_billing_portal_session(self, user: User, db: Session) -> str:
+        """
+        Create a Stripe Customer Portal session URL so the user can manage/cancel their subscription.
+        """
+        customer_id = self.ensure_customer(user, db)
+        base = settings.APP_BASE_URL.rstrip("/")
+        portal = stripe_post_form(
+            "/billing_portal/sessions",
+            {
+                "customer": customer_id,
+                "return_url": f"{base}/",
+            },
+        )
+        return portal["url"]
+
     def _apply_premium(self, user: User, *, status: Optional[str], renews_at: Optional[datetime], db: Session) -> None:
         user.plan = "premium"
         user.plan_status = status or user.plan_status or "active"

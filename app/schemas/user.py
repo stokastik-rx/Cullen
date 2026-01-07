@@ -27,6 +27,7 @@ class User(UserBase):
     """Schema for user response"""
     id: int
     subscription_tier: str
+    is_admin: bool = False
     created_at: datetime
     updated_at: datetime
     
@@ -37,6 +38,7 @@ class UserProfile(BaseModel):
     """Schema for user profile (for user card display)"""
     username: str
     subscription_tier: str
+    is_admin: bool = False
     
     model_config = {"from_attributes": True}
 

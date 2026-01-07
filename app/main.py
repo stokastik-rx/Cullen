@@ -93,6 +93,17 @@ def roster_page():
 """
     return HTMLResponse(content=html, status_code=403)
 
+
+@app.get("/admin", include_in_schema=False)
+def admin_page():
+    """
+    Serve the admin UI (requires an admin JWT to use the API, but page itself is static).
+    """
+    preferred = os.path.join("static", "pages", "admin.html")
+    if os.path.exists(preferred):
+        return FileResponse(preferred)
+    return JSONResponse(status_code=404, content={"message": "Admin page not found"})
+
 # Include routers
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.include_router(conversations_router, prefix="/api")

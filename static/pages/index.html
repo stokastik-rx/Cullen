@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>C U L L E N . A I</title>
 
-  <link rel="stylesheet" href="/static/styles.css?v=6">
+  <link rel="stylesheet" href="/static/styles.css?v=7">
 
   <!-- Favicon -->
   <link rel="icon" href="/static/favicon/favicon.ico" sizes="any">
@@ -143,6 +143,11 @@
     </main>
   </div>
 
+  <!-- Admin Panel (admins only; toggled by app_bootstrap.js) -->
+  <button id="adminPanelBtn" class="admin-panel-btn" type="button" style="display: none;">
+    Admin Panel
+  </button>
+
   <!-- AUTH MODALS (ONE COPY EACH) -->
   <div id="signupModal" class="modal-overlay">
     <div class="modal-content">
@@ -255,6 +260,9 @@
               <button class="plan-button plan-button-primary" id="planButtonPremium" type="button">
                 Upgrade
               </button>
+              <button class="plan-button plan-button-current" id="manageBillingBtn" type="button" style="display: none; margin-top: 10px;">
+                Manage Billing
+              </button>
             </div>
           </div>
         </div>
@@ -317,14 +325,14 @@
   </div>
 
   <!-- Scripts (ONLY ONCE EACH) -->
-  <script src="/static/api.js?v=1"></script>
+  <script src="/static/api.js?v=2"></script>
   <script src="/static/auth_client.js?v=1"></script>
   <script src="/static/app_bootstrap.js?v=1"></script>
   <script src="/static/auth_shared.js?v=3"></script>
   <script src="/static/cullen_menu.js?v=1"></script>
   <script src="/static/sidebar.js?v=3"></script>
   <script src="/static/shared_state.js?v=1"></script>
-  <script src="/static/script.js?v=4"></script>
+  <script src="/static/script.js?v=5"></script>
   <script src="/static/roster_store.js?v=2"></script>
   <script src="/static/roster_shared.js?v=2"></script>
 </body>

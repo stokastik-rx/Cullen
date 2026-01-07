@@ -29,6 +29,7 @@ class AuthMeResponse(BaseModel):
     user_id: Optional[int] = None
     email: Optional[str] = None
     subscription_tier: Optional[str] = None
+    is_admin: Optional[bool] = None
 
 
 class LogoutResponse(BaseModel):
@@ -109,6 +110,7 @@ async def auth_me(request: Request, db: Session = Depends(get_db)):
         user_id=user.id,
         email=user.email,
         subscription_tier=getattr(user, "subscription_tier", None),
+        is_admin=getattr(user, "is_admin", None),
     )
 
 @router.post("/auth/signup", status_code=status.HTTP_201_CREATED)

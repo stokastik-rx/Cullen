@@ -41,6 +41,9 @@ pip-delete-this-directory.txt
 *.swo
 *~
 
+# Cursor / local IDE state
+.cursor/
+
 # Environment variables
 .env
 .env.local
@@ -53,6 +56,9 @@ logs/
 *.db
 *.sqlite
 *.sqlite3
+
+# User-uploaded files (local runtime artifacts)
+uploads/
 
 # OS
 .DS_Store

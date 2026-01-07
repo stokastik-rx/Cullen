@@ -27,8 +27,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    # Database Configuration (example - adjust as needed)
-    DATABASE_URL: str = "sqlite:///./app.db"
+    # Database Configuration
+    # PostgreSQL (SQLAlchemy + psycopg v3):
+    # postgresql+psycopg://user:password@localhost:5432/dbname
+    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/cullen"
     
     # Logging
     LOG_LEVEL: str = "INFO"

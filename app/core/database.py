@@ -23,7 +23,16 @@ def _is_sqlite_url(url: str) -> bool:
 
 
 def _build_engine(url: str) -> Engine:
-    connect_args = {"check_same_thread": False} if _is_sqlite_url(url) else {}
+    # Keep dev startup snappy:
+    # - SQLite needs check_same_thread=False for FastAPI thread usage.
+    # - Postgres should have a short connect timeout so we can fall back quickly if it's not running.
+    lower = url.strip().lower()
+    if _is_sqlite_url(lower):
+        connect_args = {"check_same_thread": False}
+    elif lower.startswith("postgres"):
+        connect_args = {"connect_timeout": 2}
+    else:
+        connect_args = {}
     return create_engine(
         url,
         connect_args=connect_args,
@@ -92,13 +101,14 @@ def init_db():
     """
     Base.metadata.create_all(bind=engine)
     
-    # Migration: Add subscription_tier column if it doesn't exist
+    # Migration: Add subscription_tier / admin / billing columns if needed
     from sqlalchemy import inspect, text
     inspector = inspect(engine)
     table_names = inspector.get_table_names()
     dialect = engine.dialect.name
     is_postgres = dialect == "postgresql"
     plan_renews_at_sql_type = "TIMESTAMPTZ" if is_postgres else "TIMESTAMP"
+    is_admin_sql_type = "BOOLEAN" if is_postgres else "INTEGER"
     
     if 'users' in table_names:
         columns = [col['name'] for col in inspector.get_columns('users')]
@@ -115,6 +125,26 @@ def init_db():
                     import logging
                     logger = logging.getLogger(__name__)
                     logger.warning(f"Migration warning: {e}")
+                    conn.rollback()
+
+        # Migration: Add is_admin column (defaults to false)
+        # NOTE: Keep this server-side only; never allow clients to set it directly.
+        # Refresh columns list in case earlier migrations succeeded.
+        columns = [col["name"] for col in inspector.get_columns("users")]
+        if "is_admin" not in columns:
+            with engine.connect() as conn:
+                try:
+                    if is_postgres:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT FALSE"))
+                    else:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0"))
+                    conn.commit()
+                    conn.execute(text("CREATE INDEX IF NOT EXISTS ix_users_is_admin ON users (is_admin)"))
+                    conn.commit()
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"Migration warning (users is_admin): {e}")
                     conn.rollback()
 
         # Migration: Add billing/plan columns (additive)
